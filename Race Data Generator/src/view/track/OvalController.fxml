@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.Text?>
+<?import java.lang.Integer?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.track.OvalController">
+    <fx:define>
+        <Integer fx:id="DEFAULT_TRACK_LENGTH" fx:value="5000" />
+    </fx:define>
+    <top>
+        <GridPane alignment="center" hgap="10" vgap="10">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <Text text="Track Distance:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="distanceField" text="$DEFAULT_TRACK_LENGTH" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        </GridPane>
+    </top>
+    <center>
+        <Group>
+            <!--Top measurement line-->
+            <Text fx:id="widthLabel" x="260" text="500" textAlignment="CENTER"/>
+            <Line stroke="red" startY="5" endY="5" startX="30" endX="530" strokeWidth="3"/>
+            <Line stroke="red" startX="30" endX="30" endY="10" strokeWidth="3"/>
+            <Line stroke="red" startX="530" endX="530" endY="10" strokeWidth="3"/>
+
+            <!--Start of left measurement line-->
+            <Text fx:id="heightLabel" y="120" text="200" rotate="270" />
+            <Line stroke="red" startX="20" endX="20" startY="20" endY="230" strokeWidth="3"/>
+            <Line stroke="red" startX="15" endX="25" startY="20" endY="20" strokeWidth="3"/>
+            <Line stroke="red" startX="15" endX="25" startY="230" endY="230" strokeWidth="3"/>
+
+            <!--Oval Track display-->
+            <Rectangle arcHeight="200" arcWidth="200" fill="whitesmoke" height="200" stroke="black" width="500" y="20" x="30" />
+        </Group>
+    </center>
+</BorderPane>

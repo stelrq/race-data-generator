@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane fx:id="pane" prefHeight="300.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="view.Controller">
+  <fx:define>
+    <String fx:value="output.race" fx:id="DEFAULT_FILE" />
+  </fx:define>
+  <bottom>
+    <GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+      <Button fx:id="outputFileButton" focusTraversable="false" text="Browse..." GridPane.columnIndex="0" GridPane.rowIndex="1" />
+      <Text fx:id="fileDisplay" text="output.race" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Button fx:id="submitRace" focusTraversable="false" text="Generate Race" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+      <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" />
+    </GridPane>
+  </bottom>
+  <top>
+    <GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+      <Text text="Telemetry Interval (ms)" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Slider fx:id="telemetryIntervalSlider" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Text text="Average Lap Time (seconds)" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+      <TextField fx:id="lapTimeField" text="60" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Text text="Number of laps" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+      <TextField fx:id="numLapsField" text="1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Text text="Number of Racers" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+      <TextField fx:id="numRacersField" text="10" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Text text="Race Name" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+      <TextField fx:id="raceName" prefHeight="22.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    </GridPane>
+  </top>
+</BorderPane>
