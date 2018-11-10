@@ -1,6 +1,6 @@
 package view;
 
-import model.Track;
+import model.track.Track;
 
 /**
  * 

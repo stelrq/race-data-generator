@@ -8,10 +8,10 @@ import static java.lang.Math.ceil;
  * @author Myles Haynes
  */
 public class Racer implements Comparable<Racer> {
-
+	private static Random rng = new Random();
 	private double distance;
 	private double fastMin;
-	private String racerId;
+	private int racerId;
 	private double fastMax;
 	private int trackDistance;
 	private int lapNum;
@@ -21,15 +21,12 @@ public class Racer implements Comparable<Racer> {
 
 	private SpeedClass lastSpeed;
 
-	private Random rng;
-
-	public Racer(String id, double startDistance, int trackDistance, double fastMin, double fastMax, Random rng) {
+	public Racer(int id, double startDistance, int trackDistance, double fastMin, double fastMax) {
 		this.distance = startDistance;
 		this.racerId = id;
 		this.trackDistance = trackDistance;
 		this.fastMin = fastMin;
 		this.fastMax = fastMax;
-		this.rng = rng;
 		this.name = buildRacerName();
 		changeSpeed(SpeedClass.FAST);
 		lastSpeed = SpeedClass.FAST;
@@ -96,12 +93,12 @@ public class Racer implements Comparable<Racer> {
 	}
 
 	public String getRacerId() {
-		return racerId;
+		return Integer.toString(racerId);
 	}
 
 	@Override
 	public String toString() {
-		return getRacerId() + " : " + getDistance();
+		return racerId + " : " + distance;
 	}
 
 	@Override

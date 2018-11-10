@@ -3,6 +3,8 @@ package model;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import model.track.Track;
+
 import static java.lang.Math.round;
 import static java.lang.String.format;
 import static java.util.Collections.sort;
@@ -104,17 +106,17 @@ public class Race {
 		double minSpeed = speed * 0.98;
 		double maxSpeed = speed * 1.02;
 
-		HashSet<String> usedIds = new HashSet<>();
-		for (int i = 0; i < numRacers; i++) {
-			String id = format("%02d", rng.nextInt(100));
-			while (usedIds.contains(id)) {
-				id = Integer.toString(rng.nextInt(100));
-			}
-			usedIds.add(id);
-			int startDistance = round(track.getTrackLength() * (-i * .01f));
-			Racer racer = new Racer(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed, rng);
+		HashSet<Integer> usedIds = new HashSet<>();
+		while (usedIds.size() < numRacers) {
+			usedIds.add(rng.nextInt(100));
+		}
+		int i = 0;
+		for (int id : usedIds) {
+			int startDistance = round(track.getTrackLength() * (i * .01f));
+			Racer racer = new Racer(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed);
 			lastMessageTime.put(racer, i);
 			racers.add(racer);
+			i--;
 		}
 		return racers;
 	}

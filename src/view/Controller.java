@@ -8,7 +8,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import model.Race;
-import model.Track;
+import model.track.Track;
 import view.track.OvalController;
 import view.util.IntListener;
 

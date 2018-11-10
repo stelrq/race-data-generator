@@ -3,8 +3,8 @@ package view.track;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import model.Track;
 import model.track.OvalTrack;
+import model.track.Track;
 import view.TrackController;
 import view.util.IntListener;
 

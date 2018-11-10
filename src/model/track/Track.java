@@ -1,4 +1,6 @@
-package model;
+package model.track;
+
+import model.SpeedClass;
 
 /**
  * 
@@ -16,7 +18,7 @@ public abstract class Track {
 		return trackLength;
 	}
 
-	protected abstract SpeedClass getSpeedClass(double distance);
+	public abstract SpeedClass getSpeedClass(double distance);
 
 	public abstract String getTrackName();
 

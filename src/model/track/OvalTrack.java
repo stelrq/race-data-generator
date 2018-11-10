@@ -1,7 +1,6 @@
 package model.track;
 
 import model.SpeedClass;
-import model.Track;
 
 import static java.lang.Math.PI;
 
@@ -11,12 +10,12 @@ import static java.lang.Math.PI;
  */
 public class OvalTrack extends Track {
 
-	private double firstStraightAway;
-	private double firstFirstHalfCurve;
-	private double firstSecondHalfCurve;
-	private double secondStraightAway;
-	private double secondFirstHalfCurve;
-	private double secondSecondHalfCurve;
+	private double frontStraightAway;
+	private double firstTurn;
+	private double secondTurn;
+	private double backStraightAway;
+	private double thirdTurn;
+	private double fourthTurn;
 
 	public OvalTrack(int distance) {
 		super(distance);
@@ -25,17 +24,17 @@ public class OvalTrack extends Track {
 
 	@Override
 	public SpeedClass getSpeedClass(double d) {
-		if (d >= 0 && d < firstFirstHalfCurve) {
+		if (d >= 0 && d < firstTurn) {
 			return SpeedClass.MEDIUM_SLOW;
-		} else if (d < firstSecondHalfCurve) {
+		} else if (d < secondTurn) {
 			return SpeedClass.MEDIUM_FAST;
-		} else if (d < firstStraightAway) {
+		} else if (d < frontStraightAway) {
 			return SpeedClass.FAST;
-		} else if (d < secondFirstHalfCurve) {
+		} else if (d < thirdTurn) {
 			return SpeedClass.MEDIUM_SLOW;
-		} else if (d < secondSecondHalfCurve) {
+		} else if (d < fourthTurn) {
 			return SpeedClass.MEDIUM_FAST;
-		} else if (d < secondStraightAway) {
+		} else if (d < backStraightAway) {
 			return SpeedClass.FAST;
 		} else {
 			return SpeedClass.FAST;
@@ -45,12 +44,12 @@ public class OvalTrack extends Track {
 	private void buildTrackMap() {
 		double straightDist = getWidth(trackLength) - getHeight(trackLength);
 		double curveDistance = (getHeight(trackLength) * .5) * PI;
-		firstFirstHalfCurve = (curveDistance / 2);
-		firstSecondHalfCurve = curveDistance;
-		firstStraightAway = curveDistance + straightDist;
-		secondFirstHalfCurve = secondStraightAway + (curveDistance / 2);
-		secondSecondHalfCurve = secondStraightAway + curveDistance;
-		secondStraightAway = secondSecondHalfCurve + straightDist;
+		firstTurn = (curveDistance / 2);
+		secondTurn = curveDistance;
+		frontStraightAway = curveDistance + straightDist;
+		thirdTurn = backStraightAway + (curveDistance / 2);
+		fourthTurn = backStraightAway + curveDistance;
+		backStraightAway = fourthTurn + straightDist;
 	}
 
 	public String getTrackName() {
