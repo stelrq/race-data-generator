@@ -16,37 +16,36 @@ import static java.lang.String.format;
  */
 public class OvalController extends TrackController {
 
-  private int distance;
+	private int distance;
 
-  @FXML
-  private TextField distanceField;
+	@FXML
+	private TextField distanceField;
 
-  @FXML
-  private Text widthLabel;
+	@FXML
+	private Text widthLabel;
 
-  @FXML
-  private Text heightLabel;
+	@FXML
+	private Text heightLabel;
 
+	@FXML
+	public void initialize() {
+		onDistanceChange(Integer.parseInt(distanceField.textProperty().getValue()));
+		distanceField.textProperty().addListener(new IntListener(this::onDistanceChange));
 
-  @FXML
-  public void initialize() {
-    onDistanceChange(Integer.parseInt(distanceField.textProperty().getValue()));
-    distanceField.textProperty().addListener(new IntListener(this::onDistanceChange));
+	}
 
-  }
+	@Override
+	public Track getTrack() {
+		return new OvalTrack(distance);
+	}
 
-  @Override
-  public Track getTrack() {
-    return new OvalTrack(distance);
-  }
+	private void onDistanceChange(int dist) {
+		distance = dist;
+		double width = OvalTrack.getWidth(distance);
+		double height = OvalTrack.getHeight(distance);
 
-  private void onDistanceChange(int dist) {
-    distance = dist;
-    double width = OvalTrack.getWidth(distance);
-    double height = OvalTrack.getHeight(distance);
-
-    widthLabel.setText(format("%.0f", width));
-    heightLabel.setText(format("%.0f", height));
-  }
+		widthLabel.setText(format("%.0f", width));
+		heightLabel.setText(format("%.0f", height));
+	}
 
 }

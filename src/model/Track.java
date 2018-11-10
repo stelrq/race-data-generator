@@ -4,26 +4,20 @@ package model;
  * 
  * @author Myles Haynes
  */
-public abstract class  Track {
+public abstract class Track {
 
+	protected int trackLength;
 
-  protected int trackLength;
+	public Track(int trackLength) {
+		this.trackLength = trackLength;
+	}
 
-  public Track(int trackLength) {
-    this.trackLength = trackLength;
-  }
+	public int getTrackLength() {
+		return trackLength;
+	}
 
-  public int getTrackLength() {
-    return trackLength;
-  }
+	protected abstract SpeedClass getSpeedClass(double distance);
 
-
-  protected abstract SpeedClass getSpeedClass(double distance);
-
-  public abstract String getTrackName();
-
-
-
-
+	public abstract String getTrackName();
 
 }

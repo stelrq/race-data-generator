@@ -22,148 +22,134 @@ import java.io.PrintWriter;
  */
 public class Controller {
 
+	private static final int DEFAULT_LAP_TIME = 60;
+	private static final int DEFAULT_RACERS = 10;
+	private static final int DEFAULT_NUM_LAPS = 1;
+	public ProgressBar progressBar;
 
-  private static final int DEFAULT_LAP_TIME = 60;
-  private static final int DEFAULT_RACERS = 10;
-  private static final int DEFAULT_NUM_LAPS = 1;
-  public ProgressBar progressBar;
+	@FXML
+	private TextField raceName;
 
+	@FXML
+	private String DEFAULT_FILE;
 
-  @FXML
-  private TextField raceName;
+	@FXML
+	private Slider telemetryIntervalSlider;
 
-  @FXML
-  private String DEFAULT_FILE;
+	private File outputFile;
 
-  @FXML
-  private Slider telemetryIntervalSlider;
+	private TrackController controller;
 
-  private File outputFile;
+	@FXML
+	private Text fileDisplay;
 
-  private TrackController controller;
+	@FXML
+	private Button outputFileButton;
 
-  @FXML
-  private Text fileDisplay;
+	@FXML
+	private TextField numLapsField;
 
-  @FXML
-  private Button outputFileButton;
+	@FXML
+	private Button submitRace;
 
-  @FXML
-  private TextField numLapsField;
+	@FXML
+	private BorderPane pane;
 
-  @FXML
-  private Button submitRace;
+	@FXML
+	private TextField lapTimeField;
 
-  @FXML
-  private BorderPane pane;
+	@FXML
+	private TextField numRacersField;
 
-  @FXML
-  private TextField lapTimeField;
+	private int numLaps;
+	private int numRacers;
+	private int lapTime;
 
-  @FXML
-  private TextField numRacersField;
+	/**
+	 * This is called when Controller.fxml is loaded by javafx, its essentially a
+	 * constructor.
+	 */
+	@FXML
+	public void initialize() {
 
+		outputFile = new File(DEFAULT_FILE);
+		try {
+			fileDisplay.setText(outputFile.getCanonicalPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		numLaps = DEFAULT_NUM_LAPS;
+		numRacers = DEFAULT_RACERS;
+		lapTime = DEFAULT_LAP_TIME;
+		setUpCenter();
 
-  private int numLaps;
-  private int numRacers;
-  private int lapTime;
+		outputFileButton.setOnAction(event -> chooseFile());
+		submitRace.setOnAction(event -> onSubmit());
 
+		numRacersField.textProperty().addListener(new IntListener((i) -> numRacers = i));
+		numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
+		lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
 
-  /**
-   * This is called when Controller.fxml is loaded by javafx, its essentially a constructor.
-   */
-  @FXML
-  public void initialize() {
+	}
 
+	private void setUpCenter() {
+		try {
+			FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
+			pane.setCenter(loader.load());
+			controller = loader.getController();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    outputFile = new File(DEFAULT_FILE);
-    try {
-      fileDisplay.setText(outputFile.getCanonicalPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    numLaps = DEFAULT_NUM_LAPS;
-    numRacers = DEFAULT_RACERS;
-    lapTime = DEFAULT_LAP_TIME;
-    setUpCenter();
+	private void chooseFile() {
+		FileChooser chooser = new FileChooser();
+		outputFile = chooser.showSaveDialog(null);
+		try {
+			fileDisplay.setText(outputFile.getCanonicalPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    outputFileButton.setOnAction(event -> chooseFile());
-    submitRace.setOnAction(event -> onSubmit());
+	private void onSubmit() {
+		progressBar.setVisible(true);
+		SimTask task = new SimTask();
+		progressBar.progressProperty().bind(task.progressProperty());
+		task.setOnSucceeded(wse -> progressBar.setVisible(false));
+		new Thread(task).start();
+	}
 
-    numRacersField.textProperty().addListener(new IntListener((i) -> numRacers = i));
-    numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
-    lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
+	private class SimTask extends Task<Void> {
 
+		@Override
+		protected Void call() throws Exception {
+			try (PrintWriter pw = new PrintWriter(outputFile)) {
 
-  }
+				int telemetryInterval = (int) telemetryIntervalSlider.getValue();
+				Track track = controller.getTrack();
+				Race race = new Race(track, numLaps, numRacers, lapTime, telemetryInterval);
 
-  private void setUpCenter() {
-    try {
-      FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
-      pane.setCenter(loader.load());
-      controller = loader.getController();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+				int expectedTime = 1000 * lapTime * numLaps; // Convert seconds to millis
+				int currentTime = 0;
+				pw.println("#RACE:" + raceName.getText());
+				pw.println("#TRACK:" + track.getTrackName());
+				pw.println("#DISTANCE:" + track.getTrackLength());
+				pw.println("#TIME:" + expectedTime);
+				pw.println("#PARTICIPANTS:" + numRacers);
 
-
-  private void chooseFile() {
-    FileChooser chooser = new FileChooser();
-    outputFile = chooser.showSaveDialog(null);
-    try {
-      fileDisplay.setText(outputFile.getCanonicalPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-
-
-  private void onSubmit() {
-    progressBar.setVisible(true);
-    SimTask task = new SimTask();
-    progressBar.progressProperty().bind(task.progressProperty());
-    task.setOnSucceeded(wse -> progressBar.setVisible(false));
-    new Thread(task).start();
-  }
-
-
-  private class SimTask extends Task<Void> {
-
-    @Override
-    protected Void call() throws Exception {
-      try (PrintWriter pw = new PrintWriter(outputFile)) {
-
-        int telemetryInterval = (int) telemetryIntervalSlider.getValue();
-        Track track = controller.getTrack();
-        Race race = new Race(track, numLaps, numRacers, lapTime, telemetryInterval);
-
-        int expectedTime = 1000 * lapTime * numLaps; //Convert seconds to millis
-        int currentTime = 0;
-        pw.println("#RACE:" + raceName.getText());
-        pw.println("#TRACK:" + track.getTrackName());
-        pw.println("#DISTANCE:" + track.getTrackLength());
-        pw.println("#TIME:" + expectedTime);
-        pw.println("#PARTICIPANTS:" + numRacers);
-
-        while(race.stillGoing()) {
-          race.stepRace().forEach(pw::println);
-          currentTime++;
-          updateProgress(currentTime, expectedTime);
-        }
-        System.out.println("RACE OVER");
-        pw.close();
-      } catch(Exception e) {
-        e.printStackTrace();
-      }
-      return null;
-    }
-  }
-
-
-
-
-
+				while (race.stillGoing()) {
+					race.stepRace().forEach(pw::println);
+					currentTime++;
+					updateProgress(currentTime, expectedTime);
+				}
+				System.out.println("RACE OVER");
+				pw.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
 
 }

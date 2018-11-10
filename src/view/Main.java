@@ -12,17 +12,16 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        primaryStage.setTitle("305 Race Builder");
-        Parent s = FXMLLoader.load(getClass().getResource("Controller.fxml"));
-        Scene scene = new Scene(s, 700, 650);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		primaryStage.setTitle("305 Race Builder");
+		Parent s = FXMLLoader.load(getClass().getResource("Controller.fxml"));
+		Scene scene = new Scene(s, 700, 650);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
 
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+	public static void main(String[] args) {
+		launch(args);
+	}
 }
