@@ -7,7 +7,7 @@ import static java.lang.Math.ceil;
  * 
  * @author Myles Haynes
  */
-public class Racer implements Comparable<Racer> {
+public class Participant implements Comparable<Participant> {
 	private static Random rng = new Random();
 	private double distance;
 	private double fastMin;
@@ -21,7 +21,7 @@ public class Racer implements Comparable<Racer> {
 
 	private SpeedClass lastSpeed;
 
-	public Racer(int id, double startDistance, int trackDistance, double fastMin, double fastMax) {
+	public Participant(int id, double startDistance, int trackDistance, double fastMin, double fastMax) {
 		this.distance = startDistance;
 		this.racerId = id;
 		this.trackDistance = trackDistance;
@@ -102,7 +102,7 @@ public class Racer implements Comparable<Racer> {
 	}
 
 	@Override
-	public int compareTo(Racer o) {
+	public int compareTo(Participant o) {
 		if (lapNum != o.lapNum) {
 			return o.lapNum - lapNum;
 		} else if (distance != o.distance) {

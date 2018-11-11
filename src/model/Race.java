@@ -22,10 +22,10 @@ public class Race {
 	private final int numRacers;
 	private int time;
 	private Random rng;
-	private Map<Racer, Integer> lastMessageTime;
+	private Map<Participant, Integer> lastMessageTime;
 	private final int granularity;
 
-	private List<Racer> racers;
+	private List<Participant> racers;
 
 	public Race(Track track, int numLaps, int numRacers, int avgLapTime, int telemetryInterval) {
 		this.track = track;
@@ -45,7 +45,7 @@ public class Race {
 		if (time == 0) {
 			messages.addAll(setUpMessages());
 		}
-		for (Racer r : racers) {
+		for (Participant r : racers) {
 			r.step(track.getSpeedClass(r.getDistance()));
 
 			if (lastMessageTime.get(r) % granularity == 0) {
@@ -66,17 +66,17 @@ public class Race {
 	}
 
 	public boolean stillGoing() {
-		return racers.stream().map(Racer::getLapNum).anyMatch((l) -> l < numLaps);
+		return racers.stream().map(Participant::getLapNum).anyMatch((l) -> l < numLaps);
 	}
 
 	private Optional<String> newLeaderBoard() {
-		List<Racer> prevPlaces = new ArrayList<>(racers);
+		List<Participant> prevPlaces = new ArrayList<>(racers);
 		sort(racers);
 		if (prevPlaces.equals(racers)) {
 			return Optional.empty();
 		} else {
 			String leaderBoard = "$L:" + time + ":";
-			leaderBoard += racers.stream().map(Racer::getRacerId).map(Object::toString).collect(joining(":"));
+			leaderBoard += racers.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":"));
 			return Optional.of(leaderBoard);
 		}
 	}
@@ -84,7 +84,7 @@ public class Race {
 	private List<String> crossingMessages() {
 
 		List<String> messages = new ArrayList<>();
-		for (Racer r : racers) {
+		for (Participant r : racers) {
 			if (r.timeUntilCrossingFinish() < 1) {
 				double crossTime = time + r.timeUntilCrossingFinish();
 				int newLap = r.getLapNum() + 1;
@@ -95,12 +95,12 @@ public class Race {
 
 	}
 
-	private List<Racer> buildRacers() {
+	private List<Participant> buildRacers() {
 
 		if (numRacers > 100) {
 			throw new UnsupportedOperationException("Cannot create more than 100 racers currently.");
 		}
-		List<Racer> racers = new ArrayList<>();
+		List<Participant> racers = new ArrayList<>();
 
 		double speed = track.getTrackLength() * 1.0 / avgLapTime;
 		double minSpeed = speed * 0.98;
@@ -113,7 +113,7 @@ public class Race {
 		int i = 0;
 		for (int id : usedIds) {
 			int startDistance = round(track.getTrackLength() * (i * .01f));
-			Racer racer = new Racer(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed);
+			Participant racer = new Participant(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed);
 			lastMessageTime.put(racer, i);
 			racers.add(racer);
 			i--;
