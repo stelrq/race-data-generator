@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import model.Race;
@@ -17,7 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * 
+ *
  * @author Myles Haynes
  */
 public class Controller {
@@ -29,9 +30,6 @@ public class Controller {
 
 	@FXML
 	private TextField raceName;
-
-	@FXML
-	private String DEFAULT_FILE;
 
 	@FXML
 	private Slider telemetryIntervalSlider;
@@ -61,6 +59,9 @@ public class Controller {
 	@FXML
 	private TextField numRacersField;
 
+	@FXML
+	private GridPane racerPane;
+
 	private int numLaps;
 	private int numRacers;
 	private int lapTime;
@@ -71,16 +72,17 @@ public class Controller {
 	 */
 	@FXML
 	public void initialize() {
+		numLaps = DEFAULT_NUM_LAPS;
+		numRacers = DEFAULT_RACERS;
+		lapTime = DEFAULT_LAP_TIME;
 
-		outputFile = new File(DEFAULT_FILE);
+		outputFile = new File(numLaps + "lap-" + numRacers + "racer-" + lapTime + "timeRace.rce");
 		try {
 			fileDisplay.setText(outputFile.getCanonicalPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		numLaps = DEFAULT_NUM_LAPS;
-		numRacers = DEFAULT_RACERS;
-		lapTime = DEFAULT_LAP_TIME;
+
 		setUpCenter();
 
 		outputFileButton.setOnAction(event -> chooseFile());

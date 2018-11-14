@@ -7,30 +7,29 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.layout.FlowPane?>
 
-<BorderPane fx:id="pane" prefHeight="300.0"
-	xmlns:fx="http://javafx.com/fxml/1"
-	xmlns="http://javafx.com/javafx/2.2" fx:controller="view.Controller">
-	<fx:define>
-		<String fx:value="output.race" fx:id="DEFAULT_FILE" />
-	</fx:define>
+<BorderPane fx:id="pane" prefHeight="400.0"
+	xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+	fx:controller="view.Controller">
 	<bottom>
-		<GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
+		<FlowPane columnHalignment="CENTER" orientation="vertical" alignment="CENTER" hgap="10.0"
+			vgap="10.0" prefHeight="200">
 			<padding>
 				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
 			</padding>
+			<Text fx:id="fileDisplay" text="output.race" />
 			<Button fx:id="outputFileButton" focusTraversable="false"
-				text="Browse..." GridPane.columnIndex="0" GridPane.rowIndex="1" />
-			<Text fx:id="fileDisplay" text="output.race"
-				GridPane.columnIndex="1" GridPane.rowIndex="1" />
-			<Button fx:id="submitRace" focusTraversable="false"
-				text="Generate Race" GridPane.columnIndex="0"
-				GridPane.columnSpan="2" GridPane.rowIndex="2" />
+				text="Browse..." />
+			<Button fx:id="submitRace" focusTraversable="false" text="Generate Race" />
 			<ProgressBar fx:id="progressBar" prefWidth="200.0"
-				visible="false" GridPane.columnIndex="0" GridPane.columnSpan="2"
-				GridPane.rowIndex="0" />
-		</GridPane>
+				visible="false" />
+		</FlowPane>
 	</bottom>
+	<right>
+		<GridPane fx:id="racerPane" hgap="10.0" vgap="10.0"
+			prefWidth="100" />
+	</right>
 	<top>
 		<GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
 			<padding>
