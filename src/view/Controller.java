@@ -83,7 +83,7 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		setUpCenter();
+		setUpTrackView();
 
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
@@ -94,7 +94,7 @@ public class Controller {
 
 	}
 
-	private void setUpCenter() {
+	private void setUpTrackView() {
 		try {
 			FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
 			pane.setCenter(loader.load());
@@ -136,6 +136,11 @@ public class Controller {
 				int currentTime = 0;
 				pw.println("#RACE:" + raceName.getText());
 				pw.println("#TRACK:" + track.getTrackName());
+
+				// HARD CODED VALUES
+				pw.println("#WIDTH:5");
+				pw.println("#HEIGHT:4");
+
 				pw.println("#DISTANCE:" + track.getTrackLength());
 				pw.println("#TIME:" + expectedTime);
 				pw.println("#PARTICIPANTS:" + numRacers);

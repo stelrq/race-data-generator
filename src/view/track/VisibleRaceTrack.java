@@ -1,4 +1,4 @@
-package view;
+package view.track;
 
 import java.awt.Shape;
 import java.awt.geom.CubicCurve2D;
