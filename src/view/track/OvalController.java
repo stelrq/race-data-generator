@@ -36,7 +36,7 @@ public class OvalController extends TrackController {
 
 	@Override
 	public Track getTrack() {
-		return new OvalTrack(distance);
+		return new OvalTrack(distance,2,5);
 	}
 
 	private void onDistanceChange(int dist) {

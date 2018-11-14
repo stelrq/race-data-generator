@@ -4,11 +4,20 @@ import model.SpeedClass;
 
 import static java.lang.Math.PI;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author Myles Haynes
  */
 public class OvalTrack extends Track {
+	
+	private List<TrackSection> sections;
+	private int xRatio;
+	private int yRatio;
+	private double width;
+	private double height;
 
 	private double frontStraightAway;
 	private double firstTurn;
@@ -17,8 +26,14 @@ public class OvalTrack extends Track {
 	private double thirdTurn;
 	private double fourthTurn;
 
-	public OvalTrack(int distance) {
+	public OvalTrack(int distance, int xRatio, int yRatio) {
 		super(distance);
+		if (yRatio > xRatio) {
+			throw new IllegalArgumentException("width must be greater than height");
+		}
+		sections = new ArrayList<>();
+		this.xRatio = xRatio;
+		this.yRatio = yRatio;
 		buildTrackMap();
 	}
 
@@ -42,6 +57,15 @@ public class OvalTrack extends Track {
 	}
 
 	private void buildTrackMap() {
+		width = (xRatio*trackLength) / ((yRatio*Math.PI)+(2*xRatio)-(2*yRatio));
+		height = (yRatio*trackLength) / ((yRatio*Math.PI)+(2*xRatio)-(2*yRatio));
+		sections.add(new TrackSection(TrackSpeed.SLOW, height*Math.PI/4));
+		sections.add(new TrackSection(TrackSpeed.MEDIUM, height*Math.PI/4));
+		sections.add(new TrackSection(TrackSpeed.FAST, width-height));
+		sections.add(new TrackSection(TrackSpeed.SLOW, height*Math.PI/4));
+		sections.add(new TrackSection(TrackSpeed.MEDIUM, height*Math.PI/4));
+		sections.add(new TrackSection(TrackSpeed.FAST, width-height));
+		
 		double straightDist = getWidth(trackLength) - getHeight(trackLength);
 		double curveDistance = (getHeight(trackLength) * .5) * PI;
 		firstTurn = (curveDistance / 2);
