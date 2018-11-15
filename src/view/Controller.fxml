@@ -55,7 +55,7 @@
 				GridPane.columnIndex="1" GridPane.rowIndex="3" />
 			<Text text="Race Name" GridPane.columnIndex="0"
 				GridPane.rowIndex="4" />
-			<TextField fx:id="raceName" prefHeight="22.0"
+			<TextField fx:id="raceName" text="My305Race" prefHeight="22.0"
 				GridPane.columnIndex="1" GridPane.rowIndex="4" />
 		</GridPane>
 	</top>

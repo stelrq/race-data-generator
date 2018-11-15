@@ -49,7 +49,8 @@ public class Race {
 			participant.step(track.getSpeedClass(participant.getDistance()));
 
 			if (lastMessageTime.get(participant) % granularity == 0) {
-				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getDistance(), participant.getLapNum()));
+				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getDistance(),
+						participant.getLapNum()));
 			}
 			lastMessageTime.compute(participant, (_r, i) -> i + 1);
 		}
@@ -60,8 +61,10 @@ public class Race {
 	}
 
 	private List<String> setUpMessages() {
-		return racers.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getDistance())
+		List<String> returnList = racers.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getDistance())
 				.collect(Collectors.toList());
+		returnList.add("$L:0:" + racers.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
+		return returnList;
 
 	}
 
