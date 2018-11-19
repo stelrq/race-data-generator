@@ -16,6 +16,8 @@ public class Participant implements Comparable<Participant> {
 	private int trackDistance;
 	private int lapNum;
 	private String name;
+	private double acceleration;
+	private double deceleration;
 
 	private double currentSpeed;
 
@@ -30,6 +32,8 @@ public class Participant implements Comparable<Participant> {
 		this.name = buildRacerName();
 		changeSpeed(SpeedClass.FAST);
 		lastSpeed = SpeedClass.FAST;
+		acceleration = 0.05;
+		deceleration = 0.1;
 	}
 
 	public double step(SpeedClass speedClass) {
