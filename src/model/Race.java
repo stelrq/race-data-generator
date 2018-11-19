@@ -11,7 +11,7 @@ import static java.util.Collections.sort;
 import static java.util.stream.Collectors.joining;
 
 /**
- * 
+ *
  * @author Myles Haynes
  */
 public class Race {
@@ -45,13 +45,14 @@ public class Race {
 		if (time == 0) {
 			messages.addAll(setUpMessages());
 		}
-		for (Participant r : racers) {
-			r.step(track.getSpeedClass(r.getDistance()));
+		for (Participant participant : racers) {
+			participant.step(track.getSpeedClass(participant.getDistance()));
 
-			if (lastMessageTime.get(r) % granularity == 0) {
-				messages.add(format("$T:%d:%s:%.2f:%d", time, r.getRacerId(), r.getDistance(), r.getLapNum()));
+			if (lastMessageTime.get(participant) % granularity == 0) {
+				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getDistance(),
+						participant.getLapNum()));
 			}
-			lastMessageTime.compute(r, (_r, i) -> i + 1);
+			lastMessageTime.compute(participant, (_r, i) -> i + 1);
 		}
 		newLeaderBoard().ifPresent(messages::add);
 		messages.addAll(crossingMessages());
@@ -60,8 +61,10 @@ public class Race {
 	}
 
 	private List<String> setUpMessages() {
-		return racers.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getDistance())
+		List<String> returnList = racers.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getDistance())
 				.collect(Collectors.toList());
+		returnList.add("$L:0:" + racers.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
+		return returnList;
 
 	}
 
