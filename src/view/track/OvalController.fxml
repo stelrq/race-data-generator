@@ -24,12 +24,16 @@
 			<TextField fx:id="distanceField"
 				text="$DEFAULT_TRACK_LENGTH" GridPane.columnIndex="1"
 				GridPane.rowIndex="0" />
-			<TextField fx:id="xRatio"
-				text="$DEFAULT_X_RATIO" GridPane.columnIndex="2"
-				GridPane.rowIndex="0" />
-			<TextField fx:id="yRatio"
-				text="$DEFAULT_Y_RATIO" GridPane.columnIndex="3"
-				GridPane.rowIndex="0" />
+            <Text text="X Ratio:" GridPane.columnIndex="2"
+                GridPane.rowIndex="0" />    
+			<TextField fx:id="xRatioField"
+				text="$DEFAULT_X_RATIO" GridPane.columnIndex="3"
+				GridPane.rowIndex="0" prefWidth="25" />
+            <Text text="Y Ratio:" GridPane.columnIndex="4"
+                GridPane.rowIndex="0" />  
+			<TextField fx:id="yRatioField"
+				text="$DEFAULT_Y_RATIO" GridPane.columnIndex="5"
+				GridPane.rowIndex="0" prefWidth="25" />
 
 		</GridPane>
 	</top>

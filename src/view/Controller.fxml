@@ -26,10 +26,18 @@
 				visible="false" />
 		</FlowPane>
 	</bottom>
+    <center>
+    </center>
 	<right>
-		<GridPane fx:id="racerPane" hgap="10.0" vgap="10.0"
-			prefWidth="100" />
+		<GridPane fx:id="participantPane" hgap="10.0" vgap="10.0"
+			prefWidth="250">
+        </GridPane>
 	</right>
+    <left>
+        <GridPane fx:id="trackSectionPane" hgap="10.0" vgap="10.0"
+            prefWidth="400">   
+        </GridPane>
+    </left>
 	<top>
 		<GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
 			<padding>

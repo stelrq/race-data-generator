@@ -12,7 +12,9 @@ import model.Participant;
 import model.ParticipantSpeed;
 import model.Race;
 import model.track.Track;
+import model.track.TrackSpeed;
 import view.track.OvalController;
+import view.util.DoubleListener;
 import view.util.IntListener;
 
 import java.io.File;
@@ -65,13 +67,22 @@ public class Controller {
 	private TextField numRacersField;
 
 	@FXML
-	private GridPane racerPane;
+	private GridPane participantPane;
 	
 	@FXML
-	private List<TextField> velocityFields;
+	private GridPane trackSectionPane;
+	
+	@FXML
+	private List<TextField> speedFields;
 	
 	@FXML
 	private List<TextField> rangeFields;
+	
+	@FXML
+	private List<TextField> participantNameFields;
+	
+	@FXML
+	private List<TextField> participantIdFields;
 
 	public ProgressBar progressBar;
 
@@ -113,12 +124,91 @@ public class Controller {
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
 
-		numRacersField.textProperty().addListener(new IntListener((i) -> numRacers = i));
+		numRacersField.textProperty().addListener(new IntListener((i) -> {
+			numRacers = i;
+			updateParticipantPane();
+			System.out.println(numRacers);
+			
+		}));
 		numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
 		lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
-
+		setupTrackSpeedView();
+		
 	}
-
+	
+	private void updateParticipantPane() {
+		participantNameFields = new ArrayList<>();
+		participantIdFields = new ArrayList<>();
+		participantPane.getChildren().clear();
+		for (int i = 0; i < numRacers; i++) {
+			TextField name = new TextField();
+			name.setPrefWidth(115);
+			TextField id = new TextField();
+			id.setPrefWidth(35);
+			participantNameFields.add(name);
+			participantIdFields.add(id);
+			participantPane.add(new Text("Name:"), 0, i);
+			participantPane.add(participantNameFields.get(i), 1, i);
+			participantPane.add(new Text("ID:"), 2, i);
+			participantPane.add(participantIdFields.get(i), 3, i);
+		}	
+	}
+	
+	private void setupTrackSpeedView() {
+		speedFields = new ArrayList<>();
+		rangeFields = new ArrayList<>();
+		
+		trackSectionPane.add(new Text("Fast Speed:"), 0, 0);
+		TextField fastSpeedField = new TextField("0");
+		fastSpeedField.setPrefWidth(50);
+		fastSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.FAST)));
+		speedFields.add(fastSpeedField);
+		trackSectionPane.add(fastSpeedField, 1, 0);
+		
+		trackSectionPane.add(new Text("Fast Range:"), 2, 0);
+		TextField fastRangeField = new TextField("0");
+		fastRangeField.setPrefWidth(50);
+		fastRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.FAST)));
+		rangeFields.add(fastRangeField);
+		trackSectionPane.add(fastRangeField, 3, 0);
+		
+		trackSectionPane.add(new Text("Medium Speed:"), 0, 1);
+		TextField mediumSpeedField = new TextField("0");
+		mediumSpeedField.setPrefWidth(50);
+		mediumSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.MEDIUM)));
+		speedFields.add(mediumSpeedField);
+		trackSectionPane.add(mediumSpeedField, 1, 1);
+		
+		trackSectionPane.add(new Text("Medium Range:"), 2, 1);
+		TextField mediumRangeField = new TextField("0");
+		mediumRangeField.setPrefWidth(50);
+		mediumRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.MEDIUM)));
+		rangeFields.add(mediumRangeField);
+		trackSectionPane.add(mediumRangeField, 3, 1);
+		
+		trackSectionPane.add(new Text("Slow Speed:"), 0, 2);
+		TextField slowSpeedField = new TextField("0");
+		slowSpeedField.setPrefWidth(50);
+		slowSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.SLOW)));
+		speedFields.add(slowSpeedField);
+		trackSectionPane.add(slowSpeedField, 1, 2);
+		
+		trackSectionPane.add(new Text("Slow Range:"), 2, 2);
+		TextField slowRangeField = new TextField("0");
+		slowRangeField.setPrefWidth(50);
+		slowRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.SLOW)));
+		rangeFields.add(slowRangeField);
+		trackSectionPane.add(slowRangeField, 3, 2);
+	}
+	
+	private void updateSpeedBracket(ParticipantSpeed speedBracket) {
+		
+	}
+	
+	private void updateRangeBracket(ParticipantSpeed speedBracket) {
+		
+	}
+	
 	private void setUpTrackView() {
 		try {
 			FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
