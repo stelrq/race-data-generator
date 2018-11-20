@@ -11,6 +11,8 @@
 	fx:controller="view.track.OvalController">
 	<fx:define>
 		<Integer fx:id="DEFAULT_TRACK_LENGTH" fx:value="5000" />
+		<Integer fx:id="DEFAULT_X_RATIO" fx:value="2" />
+		<Integer fx:id="DEFAULT_Y_RATIO" fx:value="1" />
 	</fx:define>
 	<top>
 		<GridPane alignment="center" hgap="10" vgap="10">
@@ -21,6 +23,12 @@
 				GridPane.rowIndex="0" />
 			<TextField fx:id="distanceField"
 				text="$DEFAULT_TRACK_LENGTH" GridPane.columnIndex="1"
+				GridPane.rowIndex="0" />
+			<TextField fx:id="xRatio"
+				text="$DEFAULT_X_RATIO" GridPane.columnIndex="2"
+				GridPane.rowIndex="0" />
+			<TextField fx:id="yRatio"
+				text="$DEFAULT_Y_RATIO" GridPane.columnIndex="3"
 				GridPane.rowIndex="0" />
 
 		</GridPane>

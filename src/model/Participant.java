@@ -1,57 +1,77 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import static java.lang.Math.ceil;
 
 /**
  * 
- * @author Myles Haynes
+ * @author Myles Haynes, Peter Bae
  */
 public class Participant implements Comparable<Participant> {
 	private static Random rng = new Random();
-	private double distance;
-	private double fastMin;
-	private int racerId;
-	private double fastMax;
-	private int trackDistance;
-	private int lapNum;
-	private String name;
-	private double acceleration;
-	private double deceleration;
+	
+	private int myID;
+	private String myName;
+	private double myPosition;
+	private double myVelocity;
+	private double myRange;
+	private double myAcceleration;	
+	private int myLapNum;
+	private int myTrackLength;
+	private List<RaceConstraint> myConstraints;
 
-	private double currentSpeed;
-
-	private SpeedClass lastSpeed;
-
-	public Participant(int id, double startDistance, int trackDistance, double fastMin, double fastMax) {
-		this.distance = startDistance;
-		this.racerId = id;
-		this.trackDistance = trackDistance;
-		this.fastMin = fastMin;
-		this.fastMax = fastMax;
-		this.name = buildRacerName();
-		changeSpeed(SpeedClass.FAST);
-		lastSpeed = SpeedClass.FAST;
-		acceleration = 0.05;
-		deceleration = 0.1;
+	public Participant(int id, double startDistance, int trackLength, double velocity, double range) {
+		myID = id;
+		myName = buildRacerName();
+		myPosition = startDistance;
+		myVelocity = velocity;
+		myRange = range;
+		myAcceleration = 0;
+		myTrackLength = trackLength;
+		myConstraints = new ArrayList<>();
 	}
 
 	public double step(SpeedClass speedClass) {
 		changeSpeed(speedClass);
-		distance += currentSpeed;
-		if (distance >= trackDistance) {
-			lapNum++;
-			distance -= trackDistance;
+		myPosition += myVelocity;
+		if (myPosition >= myTrackLength) {
+			myLapNum++;
+			myPosition -= myTrackLength;
 		}
-		return distance;
+		return myPosition;
+	}
+	
+	public double step() {
+		double velocity = myVelocity;
+		for (RaceConstraint rc : myConstraints) {
+			velocity = rc.applyContraint(velocity);
+		}
+		
+		myPosition += myVelocity;
+		
+		return myPosition;
 	}
 
-	public double getDistance() {
-		return distance;
+	public void addConstraint(RaceConstraint rc) {
+		myConstraints.add(rc);
+	}
+	
+	public void removeConstraint(RaceConstraint rc) {
+		myConstraints.remove(rc);
+	}
+	
+	public void removeConstraint(int index) {
+		myConstraints.remove(index);
+	}
+	
+	public double getPosition() {
+		return myPosition;
 	}
 
 	public int getLapNum() {
-		return lapNum;
+		return myLapNum;
 	}
 
 	/**
@@ -65,16 +85,16 @@ public class Participant implements Comparable<Participant> {
 	 *
 	 */
 	public double timeUntilCrossingFinish() {
-		return (trackDistance - distance) / currentSpeed;
+		return (myTrackLength - myPosition) / myVelocity;
 	}
 
 	private void changeSpeed(SpeedClass speedClass) {
-		if (speedClass != lastSpeed) {
-			double currentMin = fastMin + speedClass.getOffset();
-			double currentMax = fastMax + speedClass.getOffset();
-			currentSpeed = currentMin + rng.doubles(0, currentMax - currentMin).findFirst().orElse(0);
-			lastSpeed = speedClass;
-		}
+//		if (speedClass != lastSpeed) {
+//			double currentMin = fastMin + speedClass.getOffset();
+//			double currentMax = fastMax + speedClass.getOffset();
+//			currentSpeed = currentMin + rng.doubles(0, currentMax - currentMin).findFirst().orElse(0);
+//			lastSpeed = speedClass;
+//		}
 	}
 
 	/**
@@ -97,26 +117,26 @@ public class Participant implements Comparable<Participant> {
 	}
 
 	public String getRacerId() {
-		return Integer.toString(racerId);
+		return Integer.toString(myID);
 	}
 
 	@Override
 	public String toString() {
-		return racerId + " : " + distance;
+		return myID + " : " + myPosition;
 	}
 
 	@Override
 	public int compareTo(Participant o) {
-		if (lapNum != o.lapNum) {
-			return o.lapNum - lapNum;
-		} else if (distance != o.distance) {
-			return (int) ceil(o.distance - distance);
+		if (myLapNum != o.myLapNum) {
+			return o.myLapNum - myLapNum;
+		} else if (myPosition != o.myPosition) {
+			return (int) ceil(o.myPosition - myPosition);
 		} else {
 			return 0;
 		}
 	}
 
 	public String getName() {
-		return name;
+		return myName;
 	}
 }

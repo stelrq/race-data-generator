@@ -1,5 +1,5 @@
 package model;
 
 public interface RaceConstraint {
-	public void affectParticipant();
+	public double applyContraint(double velocity);
 }

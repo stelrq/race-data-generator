@@ -5,51 +5,48 @@ import java.util.stream.Collectors;
 
 import model.track.Track;
 
-import static java.lang.Math.round;
 import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.stream.Collectors.joining;
 
 /**
  *
- * @author Myles Haynes
+ * @author Myles Haynes, Peter Bae
  */
 public class Race {
-
 	private final Track track;
+	private List<Participant> participants;
 	private final int numLaps;
-	private final int avgLapTime;
-	private final int numRacers;
 	private int time;
 	private Random rng;
 	private Map<Participant, Integer> lastMessageTime;
-	private final int granularity;
+	
+	
+	private final int timeSlice;
 
-	private List<Participant> racers;
+	
 
-	public Race(Track track, int numLaps, int numRacers, int avgLapTime, int telemetryInterval) {
+	public Race(Track track, int numLaps, int telemetryInterval,
+			List<Participant> participants) {
 		this.track = track;
 		this.numLaps = numLaps;
-		this.numRacers = numRacers;
-		this.avgLapTime = avgLapTime * 1000;
-		this.time = 0;
-		this.granularity = telemetryInterval;
+		this.participants = participants;
+		time = 0;
+		timeSlice = telemetryInterval;
 		lastMessageTime = new HashMap<>();
 		rng = new Random();
-		racers = buildRacers();
 	}
 
 	public List<String> stepRace() {
-
 		List<String> messages = new ArrayList<>();
 		if (time == 0) {
 			messages.addAll(setUpMessages());
 		}
-		for (Participant participant : racers) {
-			participant.step(track.getSpeedClass(participant.getDistance()));
+		for (Participant participant : participants) {
+			participant.step(track.getSpeedClass(participant.getPosition()));
 
-			if (lastMessageTime.get(participant) % granularity == 0) {
-				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getDistance(),
+			if (lastMessageTime.get(participant) % timeSlice == 0) {
+				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getPosition(),
 						participant.getLapNum()));
 			}
 			lastMessageTime.compute(participant, (_r, i) -> i + 1);
@@ -61,25 +58,25 @@ public class Race {
 	}
 
 	private List<String> setUpMessages() {
-		List<String> returnList = racers.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getDistance())
+		List<String> returnList = participants.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getPosition())
 				.collect(Collectors.toList());
-		returnList.add("$L:0:" + racers.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
+		returnList.add("$L:0:" + participants.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
 		return returnList;
 
 	}
 
 	public boolean stillGoing() {
-		return racers.stream().map(Participant::getLapNum).anyMatch((l) -> l < numLaps);
+		return participants.stream().map(Participant::getLapNum).anyMatch((l) -> l < numLaps);
 	}
 
 	private Optional<String> newLeaderBoard() {
-		List<Participant> prevPlaces = new ArrayList<>(racers);
-		sort(racers);
-		if (prevPlaces.equals(racers)) {
+		List<Participant> prevPlaces = new ArrayList<>(participants);
+		sort(participants);
+		if (prevPlaces.equals(participants)) {
 			return Optional.empty();
 		} else {
 			String leaderBoard = "$L:" + time + ":";
-			leaderBoard += racers.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":"));
+			leaderBoard += participants.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":"));
 			return Optional.of(leaderBoard);
 		}
 	}
@@ -87,7 +84,7 @@ public class Race {
 	private List<String> crossingMessages() {
 
 		List<String> messages = new ArrayList<>();
-		for (Participant r : racers) {
+		for (Participant r : participants) {
 			if (r.timeUntilCrossingFinish() < 1) {
 				double crossTime = time + r.timeUntilCrossingFinish();
 				int newLap = r.getLapNum() + 1;
@@ -98,30 +95,30 @@ public class Race {
 
 	}
 
-	private List<Participant> buildRacers() {
-
-		if (numRacers > 100) {
-			throw new UnsupportedOperationException("Cannot create more than 100 racers currently.");
-		}
-		List<Participant> racers = new ArrayList<>();
-
-		double speed = track.getTrackLength() * 1.0 / avgLapTime;
-		double minSpeed = speed * 0.98;
-		double maxSpeed = speed * 1.02;
-
-		HashSet<Integer> usedIds = new HashSet<>();
-		while (usedIds.size() < numRacers) {
-			usedIds.add(rng.nextInt(100));
-		}
-		int i = 0;
-		for (int id : usedIds) {
-			int startDistance = round(track.getTrackLength() * (i * .01f));
-			Participant racer = new Participant(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed);
-			lastMessageTime.put(racer, i);
-			racers.add(racer);
-			i--;
-		}
-		return racers;
-	}
+//	private List<Participant> buildRacers() {
+//
+//		if (numParticipants > 100) {
+//			throw new UnsupportedOperationException("Cannot create more than 100 racers currently.");
+//		}
+//		List<Participant> racers = new ArrayList<>();
+//
+//		//double speed = track.getTrackLength() * 1.0 / avgLapTime;
+//		//double minSpeed = speed * 0.98;
+//		//double maxSpeed = speed * 1.02;
+//
+//		HashSet<Integer> usedIds = new HashSet<>();
+//		while (usedIds.size() < numParticipants) {
+//			usedIds.add(rng.nextInt(100));
+//		}
+//		int i = 0;
+//		for (int id : usedIds) {
+//			int startDistance = round(track.getTrackLength() * (i * .01f));
+//			Participant racer = new Participant(id, startDistance, track.getTrackLength(), minSpeed, maxSpeed);
+//			lastMessageTime.put(racer, i);
+//			racers.add(racer);
+//			i--;
+//		}
+//		return racers;
+//	}
 
 }

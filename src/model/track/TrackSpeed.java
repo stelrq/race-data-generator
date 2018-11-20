@@ -8,4 +8,18 @@ public enum TrackSpeed {
 	SLOW,
 	SLOWER,
 	SLOWEST;
+	
+	private double multiplier;
+	
+	TrackSpeed() {
+		multiplier = 1;
+	}
+	
+	public void setMultiplier(double mult) {
+		multiplier = mult;
+	}
+	
+	public double getMultiplier() {
+		return multiplier;
+	}
 }

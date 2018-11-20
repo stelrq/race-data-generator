@@ -20,6 +20,12 @@ public class OvalController extends TrackController {
 
 	@FXML
 	private TextField distanceField;
+	
+	@FXML
+	private TextField xRatio;
+	
+	@FXML
+	private TextField yRatio;
 
 	@FXML
 	private Text widthLabel;

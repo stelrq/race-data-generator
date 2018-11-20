@@ -1,11 +1,32 @@
 package model.track;
 
-public class TrackSection {
-	private TrackSpeed speed;
-	private double length;
+import model.RaceConstraint;
+
+/**
+ * 
+ * @author Peter Bae
+ *
+ */
+public class TrackSection implements RaceConstraint {
+	private TrackSpeed mySpeed;
+	private double myLength;
 	
 	public TrackSection(TrackSpeed speed, double length) {
-		this.speed = speed;
-		this.length = length;
+		mySpeed = speed;
+		myLength = length;
+	}
+	
+	public TrackSpeed getTracketSpeed() {
+		return mySpeed;
+	}
+	
+	public double getLength() {
+		return myLength;
+	}
+
+	@Override
+	public double applyContraint(double velocity) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

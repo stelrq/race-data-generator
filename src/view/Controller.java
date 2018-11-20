@@ -8,6 +8,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import model.Participant;
+import model.ParticipantSpeed;
 import model.Race;
 import model.track.Track;
 import view.track.OvalController;
@@ -17,18 +19,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  *
  * @author Myles Haynes
  */
 public class Controller {
-
 	private static final int DEFAULT_LAP_TIME = 60;
 	private static final int DEFAULT_RACERS = 10;
 	private static final int DEFAULT_NUM_LAPS = 1;
-
+	
+	private static Random rand = new Random();
+	
 	@FXML
 	private TextField raceName;
 
@@ -58,6 +66,12 @@ public class Controller {
 
 	@FXML
 	private GridPane racerPane;
+	
+	@FXML
+	private List<TextField> velocityFields;
+	
+	@FXML
+	private List<TextField> rangeFields;
 
 	public ProgressBar progressBar;
 
@@ -70,6 +84,9 @@ public class Controller {
 	private int numLaps;
 	private int numRacers;
 	private int lapTime;
+	
+	private Map<ParticipantSpeed, Double> speedBracket;
+	private Map<ParticipantSpeed, Double> rangeBracket;
 
 	/**
 	 * This is called when Controller.fxml is loaded by javafx, its essentially
@@ -80,6 +97,9 @@ public class Controller {
 		numLaps = DEFAULT_NUM_LAPS;
 		numRacers = DEFAULT_RACERS;
 		lapTime = DEFAULT_LAP_TIME;
+		
+		speedBracket = new HashMap<>();
+		rangeBracket = new HashMap<>();
 
 		outputFile = new File(numLaps + "lap-" + numRacers + "racer-" + lapTime + "timeRace.rce");
 		try {
@@ -158,7 +178,17 @@ public class Controller {
 
 			int telemetryInterval = (int) telemetryIntervalSlider.getValue();
 			Track track = controller.getTrack();
-			Race race = new Race(track, numLaps, numRacers, lapTime, telemetryInterval);
+			List<Participant> participants = new ArrayList<>();
+			Set<Integer> ids = new HashSet<>();
+			while (ids.size() < numRacers) {
+				ids.add(rand.nextInt(100));
+			}
+			int start = 0;
+			for (int id : ids) {
+				participants.add(new Participant(id, start, track.getTrackLength(), 
+						speedBracket.get(ParticipantSpeed.MEDIUM), speedBracket.get(ParticipantSpeed.MEDIUM)));
+			}
+			Race race = new Race(track, numLaps, telemetryInterval, participants);
 
 			// Convert seconds to millis
 			int expectedTime = 1000 * lapTime * numLaps;
