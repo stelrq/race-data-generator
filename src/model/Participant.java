@@ -10,8 +10,7 @@ import static java.lang.Math.ceil;
  * @author Myles Haynes, Peter Bae
  */
 public class Participant implements Comparable<Participant> {
-	private static Random rng = new Random();
-	
+	private static Random rng = new Random();	
 	private int myID;
 	private String myName;
 	private double myPosition;
