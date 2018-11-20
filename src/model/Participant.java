@@ -48,7 +48,7 @@ public class Participant implements Comparable<Participant> {
 			velocity = rc.applyContraint(velocity);
 		}
 		
-		myPosition += myVelocity;
+		myPosition += velocity;
 		
 		return myPosition;
 	}
