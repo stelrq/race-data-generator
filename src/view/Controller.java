@@ -44,15 +44,15 @@ public class Controller {
 	private static final int DEFAULT_LAP_TIME = 60;
 	private static final int DEFAULT_RACERS = 10;
 	private static final int DEFAULT_NUM_LAPS = 1;
-	
+
 	private static Random rand = new Random();
-	
+
 	@FXML
 	private TextField raceName;
 
 	@FXML
 	private Slider telemetryIntervalSlider;
-	
+
 	@FXML
 	private Slider trackSpeedSlider;
 
@@ -79,19 +79,19 @@ public class Controller {
 
 	@FXML
 	private GridPane participantPane;
-	
+
 	@FXML
 	private GridPane trackSectionPane;
-	
+
 	@FXML
 	private List<TextField> speedFields;
-	
+
 	@FXML
 	private List<TextField> rangeFields;
-	
+
 	@FXML
 	private List<TextField> participantNameFields;
-	
+
 	@FXML
 	private List<TextField> participantIdFields;
 
@@ -111,17 +111,17 @@ public class Controller {
 	private Map<ParticipantSpeed, Text> estimateTimes;
 
 	/**
-	 * This is called when Controller.fxml is loaded by javafx, its essentially
-	 * a constructor.
+	 * This is called when Controller.fxml is loaded by javafx, its essentially a
+	 * constructor.
 	 */
 	@FXML
 	public void initialize() {
 		linesToWrite = new ArrayList<>();
 		estimateTimes = new HashMap<>();
 		setUpTrackView();
-		
+
 		numLaps = DEFAULT_NUM_LAPS;
-		//lapTime = DEFAULT_LAP_TIME;
+		// lapTime = DEFAULT_LAP_TIME;
 		numSpeedBrackets = (int) trackSpeedSlider.getValue();
 		setSpeedBracketList();
 		setupTrackSpeedView();
@@ -135,8 +135,6 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		
-
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
 
@@ -144,20 +142,19 @@ public class Controller {
 			numRacers = i;
 			updateParticipantPane();
 		}));
-		
+
 		numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
-		//lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
-		trackSpeedSlider.valueProperty().addListener((i,o,n) -> {
+		// lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
+		trackSpeedSlider.valueProperty().addListener((i, o, n) -> {
 			numSpeedBrackets = i.getValue().intValue();
 			resetSpeedBrackets();
 			setSpeedBracketList();
 			setupTrackSpeedView();
 			updateSpeedBracketComboBox();
 		});
-		
-		
+
 	}
-	
+
 	private void updateSpeedBracketComboBox() {
 		int num = 0;
 		List<Node> boxes = new ArrayList<>();
@@ -167,12 +164,12 @@ public class Controller {
 				num++;
 			}
 		}
-		
+
 		participantPane.getChildren().removeAll(boxes);
-		
+
 		for (int i = 0; i < num; i++) {
 			ComboBox<String> cb = new ComboBox<>(getOptions());
-			cb.getSelectionModel().select(cb.getItems().size()/2);
+			cb.getSelectionModel().select(cb.getItems().size() / 2);
 			participantPane.add(cb, 4, i);
 		}
 	}
@@ -211,9 +208,9 @@ public class Controller {
 		while (set.size() < numRacers) {
 			set.add(rand.nextInt(100));
 		}
-		
+
 		Iterator<Integer> iter = set.iterator();
-		
+
 		for (int i = 0; i < numRacers; i++) {
 			TextField name = new TextField(buildRacerName());
 			name.setPrefWidth(115);
@@ -226,61 +223,60 @@ public class Controller {
 			participantPane.add(new Text("ID:"), 2, i);
 			participantPane.add(participantIdFields.get(i), 3, i);
 			ComboBox<String> cb = new ComboBox<>(getOptions());
-			cb.getSelectionModel().select(cb.getItems().size()/2);
+			cb.getSelectionModel().select(cb.getItems().size() / 2);
 			participantPane.add(cb, 4, i);
-		}	
+		}
 	}
-	
+
 	private ObservableList<String> getOptions() {
-		return FXCollections
-				.observableArrayList(speedBracketList.stream()
-						.map((name) -> name.toString())
-						.collect(Collectors.toList()));
+		return FXCollections.observableArrayList(
+				speedBracketList.stream().map((name) -> name.toString()).collect(Collectors.toList()));
 	}
-	
+
 	private void setupTrackSpeedView() {
 		speedFields = new ArrayList<>();
 		rangeFields = new ArrayList<>();
 		estimateTimes = new HashMap<>();
 		trackSectionPane.getChildren().clear();
-		
+
 		for (ParticipantSpeed ps : speedBracketList) {
 			addTrackSpeedAndRange(ps);
 		}
 	}
-	
+
 	private void addTrackSpeedAndRange(ParticipantSpeed bracket) {
-		int size = trackSectionPane.getChildren().size()/6;
-		
+		int size = trackSectionPane.getChildren().size() / 6;
+
 		trackSectionPane.add(new Text(bracket + " Speed"), 0, size);
-		
+
 		TextField speedField = new TextField("100");
 		speedField.setPrefWidth(50);
 		speedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(bracket, i)));
 		speedFields.add(speedField);
 		trackSectionPane.add(speedField, 1, size);
-		
+
 		trackSectionPane.add(new Text(bracket + " Range"), 2, size);
-		
+
 		TextField rangeField = new TextField("100");
 		rangeField.setPrefWidth(50);
 		rangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(bracket, i)));
 		rangeFields.add(rangeField);
 		trackSectionPane.add(rangeField, 3, size);
-		
+
 		trackSectionPane.add(new Text(bracket + " Est. Finish"), 4, size);
-		
-		Text estimate = new Text(String.format("%.2f", controller.getLength()/bracket.getVelocity()));
+
+		Text estimate = new Text(String.format("%.2f", controller.getLength() / bracket.getVelocity()));
 		estimateTimes.put(bracket, estimate);
 		trackSectionPane.add(estimate, 5, size);
 	}
-	
+
 	private void updateSpeedBracket(ParticipantSpeed speedBracket, double value) {
 		speedBracket.setVelocity(value);
-		estimateTimes.get(speedBracket).setText(String.format("%.2f", controller.getLength()/speedBracket.getVelocity()));
+		estimateTimes.get(speedBracket)
+				.setText(String.format("%.2f", controller.getLength() / speedBracket.getVelocity()));
 		System.out.println(speedBracket + " Speed " + value);
 	}
-	
+
 	private void resetSpeedBrackets() {
 		ParticipantSpeed.FASTEST.setVelocity(100);
 		ParticipantSpeed.FASTER.setVelocity(100);
@@ -290,12 +286,12 @@ public class Controller {
 		ParticipantSpeed.SLOWER.setVelocity(100);
 		ParticipantSpeed.SLOWEST.setVelocity(100);
 	}
-	
+
 	private void updateRangeBracket(ParticipantSpeed speedBracket, double value) {
 		speedBracket.setRange(value);
 		System.out.println(speedBracket + " Range " + value);
 	}
-	
+
 	private void setUpTrackView() {
 		try {
 			FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
@@ -315,7 +311,7 @@ public class Controller {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private String buildRacerName() {
 		int lowerA = 97; // ascii value of lowercase 'a'
 		int upperA = 65; // ascii value of uppercase 'A'
@@ -330,7 +326,7 @@ public class Controller {
 		return name.toString();
 
 	}
-	
+
 	private void onSubmit() {
 		progressBar.setVisible(true);
 		SimTask task = new SimTask();
@@ -352,7 +348,7 @@ public class Controller {
 		}
 
 		// Extract the millisecond from the string
-		int raceActuallyOver = (int)Double.parseDouble(linesToWrite.get(i).split(":")[1]);
+		int raceActuallyOver = (int) Double.parseDouble(linesToWrite.get(i).split(":")[1]);
 
 		// Because this is technically an index, add one to get the length
 		raceActuallyOver++;
@@ -366,62 +362,62 @@ public class Controller {
 	private class SimTask extends Task<Void> {
 		@Override
 		protected Void call() throws Exception {
-			System.out.println("Begin");
-			int telemetryInterval = (int) telemetryIntervalSlider.getValue();
-			Track track = controller.getTrack();
-			List<Participant> participants = new ArrayList<>();
-			List<Integer> ids = participantIdFields.stream()
-					.map((id) -> Integer.parseInt(id.textProperty().getValue()))
-					.collect(Collectors.toList());
-			List<String> names = participantNameFields.stream()
-					.map((name) -> name.textProperty().getValue())
-					.collect(Collectors.toList());
-			double start = 0;
-			//System.out.println(speedBracket);
-			//System.out.println(rangeBracket);
-			for (int id : ids) {
-				participants.add(new Participant(id, start, track.getTrackLength(), 
-						ParticipantSpeed.MEDIUM));
-				//System.out.println(id);
-			}
-			Race race = new Race(track, numLaps, telemetryInterval, participants);
-			System.out.println("race");
-			
-			
-			// Convert seconds to millis
-			int expectedTime = 1000 * lapTime * numLaps;
-
-			int currentTime = 0;
-			linesToWrite.add("#RACE:" + raceName.getText());
-			linesToWrite.add("#TRACK:" + track.getTrackName());
-
-			// TODO These are hard coded values, make things in the UI to
-			// change this.
-			linesToWrite.add("#WIDTH:5");
-			linesToWrite.add("#HEIGHT:4");
-
-			linesToWrite.add("#DISTANCE:" + track.getTrackLength());
-			linesToWrite.add("#TIME:" + expectedTime);
-			linesToWrite.add("#PARTICIPANTS:" + numRacers);
-
-			System.out.println("race2");
-			while (race.stillGoing()) {
-				System.out.println("going");
-				race.stepRace().forEach(linesToWrite::add);
-				currentTime++;
-				updateProgress(currentTime, expectedTime);
-				
-			}
-
-			adjustForLastRacer();
-
-			System.out.println("Right before writing file");
-			try (PrintWriter pw = new PrintWriter(outputFile)) {
-				System.out.println("writing file");
-				for (int i = 0; i < linesToWrite.size(); i++) {
-					pw.println(linesToWrite.get(i));
+			try {
+				System.out.println("Begin");
+				int telemetryInterval = (int) telemetryIntervalSlider.getValue();
+				Track track = controller.getTrack();
+				List<Participant> participants = new ArrayList<>();
+				List<Integer> ids = participantIdFields.stream()
+						.map((id) -> Integer.parseInt(id.textProperty().getValue())).collect(Collectors.toList());
+				List<String> names = participantNameFields.stream().map((name) -> name.textProperty().getValue())
+						.collect(Collectors.toList());
+				double start = 0;
+				// System.out.println(speedBracket);
+				// System.out.println(rangeBracket);
+				for (int id : ids) {
+					participants.add(new Participant(id, start, track.getTrackLength(), ParticipantSpeed.MEDIUM));
+					// System.out.println(id);
 				}
-				pw.close();
+				Race race = new Race(track, numLaps, telemetryInterval, participants);
+				System.out.println("race");
+
+				// Convert seconds to millis
+				int expectedTime = 1000 * lapTime * numLaps;
+
+				int currentTime = 0;
+				linesToWrite.add("#RACE:" + raceName.getText());
+				linesToWrite.add("#TRACK:" + track.getTrackName());
+
+				// TODO These are hard coded values, make things in the UI to
+				// change this.
+				linesToWrite.add("#WIDTH:5");
+				linesToWrite.add("#HEIGHT:4");
+
+				linesToWrite.add("#DISTANCE:" + track.getTrackLength());
+				linesToWrite.add("#TIME:" + expectedTime);
+				linesToWrite.add("#PARTICIPANTS:" + numRacers);
+
+				System.out.println("race2");
+				while (race.stillGoing()) {
+					System.out.println("going");
+					race.stepRace().forEach(linesToWrite::add);
+					currentTime++;
+					updateProgress(currentTime, expectedTime);
+
+				}
+
+				adjustForLastRacer();
+
+				System.out.println("Right before writing file");
+				try (PrintWriter pw = new PrintWriter(outputFile)) {
+					System.out.println("writing file");
+					for (int i = 0; i < linesToWrite.size(); i++) {
+						pw.println(linesToWrite.get(i));
+					}
+					pw.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
