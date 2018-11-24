@@ -30,7 +30,7 @@
     </center>
 	<right>
 		<GridPane fx:id="participantPane" hgap="10.0" vgap="10.0"
-			prefWidth="250">
+			minWidth="350">
         </GridPane>
 	</right>
     <left>

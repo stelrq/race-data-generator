@@ -78,11 +78,7 @@ public class Controller {
 	@FXML
 	private List<TextField> rangeFields;
 	
-	@FXML
-	private List<TextField> participantNameFields;
-	
-	@FXML
-	private List<TextField> participantIdFields;
+	private List<ParticipantDisplay> participantDisplays;
 
 	public ProgressBar progressBar;
 
@@ -111,6 +107,7 @@ public class Controller {
 		
 		speedBracket = new HashMap<>();
 		rangeBracket = new HashMap<>();
+		participantDisplays = new ArrayList<>();
 
 		outputFile = new File(numLaps + "lap-" + numRacers + "racer-" + lapTime + "timeRace.rce");
 		try {
@@ -137,21 +134,12 @@ public class Controller {
 	}
 	
 	private void updateParticipantPane() {
-		participantNameFields = new ArrayList<>();
-		participantIdFields = new ArrayList<>();
-		participantPane.getChildren().clear();
+		participantDisplays.clear();
 		for (int i = 0; i < numRacers; i++) {
-			TextField name = new TextField();
-			name.setPrefWidth(115);
-			TextField id = new TextField();
-			id.setPrefWidth(35);
-			participantNameFields.add(name);
-			participantIdFields.add(id);
-			participantPane.add(new Text("Name:"), 0, i);
-			participantPane.add(participantNameFields.get(i), 1, i);
-			participantPane.add(new Text("ID:"), 2, i);
-			participantPane.add(participantIdFields.get(i), 3, i);
-		}	
+			ParticipantDisplay newPartDisp = new ParticipantDisplay();
+			participantDisplays.add(newPartDisp);
+			participantPane.add(newPartDisp, 0, i);
+		}
 	}
 	
 	private void setupTrackSpeedView() {
