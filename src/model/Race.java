@@ -25,7 +25,6 @@ public class Race {
 	private final int timeSlice;
 
 	
-
 	public Race(Track track, int numLaps, int telemetryInterval,
 			List<Participant> participants) {
 		this.track = track;
@@ -34,6 +33,9 @@ public class Race {
 		time = 0;
 		timeSlice = telemetryInterval;
 		lastMessageTime = new HashMap<>();
+		for (int i = 0; i < participants.size(); i++) {
+			lastMessageTime.put(participants.get(i), i);
+		}
 		rng = new Random();
 	}
 
@@ -84,11 +86,11 @@ public class Race {
 	private List<String> crossingMessages() {
 
 		List<String> messages = new ArrayList<>();
-		for (Participant r : participants) {
-			if (r.timeUntilCrossingFinish() < 1) {
-				double crossTime = time + r.timeUntilCrossingFinish();
-				int newLap = r.getLapNum() + 1;
-				messages.add(format("$C:%.2f:%s:%d:%b", crossTime, r.getRacerId(), newLap, newLap == numLaps));
+		for (Participant p : participants) {
+			if (p.timeUntilCrossingFinish() <= 1) {
+				double crossTime = time + p.timeUntilCrossingFinish();
+				int newLap = p.getLapNum() + 1;
+				messages.add(format("$C:%.2f:%s:%d:%b", crossTime, p.getRacerId(), newLap, newLap == numLaps));
 			}
 		}
 		return messages;

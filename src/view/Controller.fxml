@@ -8,36 +8,40 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.control.ScrollPane?>
 
 <BorderPane fx:id="pane" prefHeight="400.0"
-	xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
-	fx:controller="view.Controller">
+	xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/2.2" fx:controller="view.Controller">
 	<bottom>
-		<FlowPane columnHalignment="CENTER" orientation="vertical" alignment="CENTER" hgap="10.0"
-			vgap="10.0" prefHeight="200">
+		<FlowPane columnHalignment="CENTER" orientation="vertical"
+			alignment="CENTER" hgap="10.0" vgap="10.0" prefHeight="200">
 			<padding>
 				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
 			</padding>
 			<Text fx:id="fileDisplay" text="output.race" />
 			<Button fx:id="outputFileButton" focusTraversable="false"
 				text="Browse..." />
-			<Button fx:id="submitRace" focusTraversable="false" text="Generate Race" />
+			<Button fx:id="submitRace" focusTraversable="false"
+				text="Generate Race" />
 			<ProgressBar fx:id="progressBar" prefWidth="200.0"
 				visible="false" />
 		</FlowPane>
 	</bottom>
-    <center>
-    </center>
+	<center>
+	</center>
 	<right>
-		<GridPane fx:id="participantPane" hgap="10.0" vgap="10.0"
-			minWidth="350">
-        </GridPane>
+		<ScrollPane fx:id="participantPane" hbarPolicy="NEVER" vbarPolicy="ALWAYS" fitToHeight="true">
+			<GridPane hgap="10.0" vgap="10.0"
+				minWidth="350">
+			</GridPane>
+		</ScrollPane>
 	</right>
-    <left>
-        <GridPane fx:id="trackSectionPane" hgap="10.0" vgap="10.0"
-            prefWidth="400">   
-        </GridPane>
-    </left>
+	<left>
+		<GridPane fx:id="trackSectionPane" hgap="10.0" vgap="10.0"
+			prefWidth="400">
+		</GridPane>
+	</left>
 	<top>
 		<GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
 			<padding>
@@ -63,8 +67,8 @@
 				GridPane.columnIndex="1" GridPane.rowIndex="3" />
 			<Text text="Race Name" GridPane.columnIndex="0"
 				GridPane.rowIndex="4" />
-			<TextField fx:id="raceName" text="My305Race" prefHeight="22.0"
-				GridPane.columnIndex="1" GridPane.rowIndex="4" />
+			<TextField fx:id="raceName" text="My305Race"
+				prefHeight="22.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 		</GridPane>
 	</top>
 </BorderPane>

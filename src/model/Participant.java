@@ -21,9 +21,9 @@ public class Participant implements Comparable<Participant> {
 	private int myTrackLength;
 	private List<RaceConstraint> myConstraints;
 
-	public Participant(int id, double startDistance, int trackLength, double velocity, double range) {
+	public Participant(int id, String name, double startDistance, int trackLength, double velocity, double range) {
 		myID = id;
-		myName = buildRacerName();
+		myName = name;
 		myPosition = startDistance;
 		myVelocity = velocity;
 		myRange = range;

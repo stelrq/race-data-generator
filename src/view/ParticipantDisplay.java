@@ -13,7 +13,7 @@ import model.ParticipantSpeed;
 public class ParticipantDisplay extends GridPane {
 
 	private static final Random myRandom = new Random();
-
+	
 	private static final String[] DEFAULT_NAMES = { "Rebecka", "Lexie", "Betsey", "Elane", "Miss", "Daniele", "Angele",
 			"Aja", "Floretta", "Patrice", "Jamison", "Myles", "Sally", "Viola", "Delicia", "Dwain", "Alfredia", "Mina",
 			"Charlena", "Catheryn", "Bud", "Suellen", "Herbert", "Adelaida", "Carmine", "Sylvie", "Fawn", "Nathanial",
@@ -35,15 +35,17 @@ public class ParticipantDisplay extends GridPane {
 	public ParticipantDisplay() {
 		// Instantiation / setting default random values
 		myNameTextField = new TextField(DEFAULT_NAMES[myRandom.nextInt(DEFAULT_NAMES.length)]);
+		
 		myRacerIDField = new TextField(
 				((Integer) (myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER)).toString());
 		ObservableList<String> options = FXCollections.observableArrayList();
+		
 		for (int i = 0; i < ParticipantSpeed.values().length; i++) {
 			options.add(ParticipantSpeed.values()[i].prettyString());
 		}
 		mySpeedComboBox = new ComboBox<String>(options);
-		mySpeedComboBox.getSelectionModel().select(myRandom.nextInt(options.size()));;
-
+		mySpeedComboBox.getSelectionModel().select(myRandom.nextInt(options.size()));;		
+		
 		// Formatting
 		myRacerIDField.setPrefColumnCount(2);
 		myNameTextField.setPrefColumnCount(10);

@@ -42,7 +42,7 @@ public class OvalController extends TrackController {
 
 	@Override
 	public Track getTrack() {
-		return new OvalTrack(distance,2,5);
+		return new OvalTrack(distance,Integer.parseInt(xRatioField.textProperty().get()),Integer.parseInt(yRatioField.textProperty().get()));
 	}
 
 	private void onDistanceChange(int dist) {
