@@ -108,6 +108,7 @@ public class Controller {
 	private int lapTime;
 	private int numSpeedBrackets;
 	private List<ParticipantSpeed> speedBracketList;
+	private Map<ParticipantSpeed, Text> estimateTimes;
 
 	/**
 	 * This is called when Controller.fxml is loaded by javafx, its essentially
@@ -116,6 +117,8 @@ public class Controller {
 	@FXML
 	public void initialize() {
 		linesToWrite = new ArrayList<>();
+		estimateTimes = new HashMap<>();
+		setUpTrackView();
 		
 		numLaps = DEFAULT_NUM_LAPS;
 		//lapTime = DEFAULT_LAP_TIME;
@@ -132,7 +135,7 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		setUpTrackView();
+		
 
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
@@ -146,6 +149,7 @@ public class Controller {
 		//lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
 		trackSpeedSlider.valueProperty().addListener((i,o,n) -> {
 			numSpeedBrackets = i.getValue().intValue();
+			resetSpeedBrackets();
 			setSpeedBracketList();
 			setupTrackSpeedView();
 			updateSpeedBracketComboBox();
@@ -167,7 +171,9 @@ public class Controller {
 		participantPane.getChildren().removeAll(boxes);
 		
 		for (int i = 0; i < num; i++) {
-			participantPane.add(new ComboBox<String>(getOptions()), 4, i);
+			ComboBox<String> cb = new ComboBox<>(getOptions());
+			cb.getSelectionModel().select(cb.getItems().size()/2);
+			participantPane.add(cb, 4, i);
 		}
 	}
 
@@ -219,7 +225,9 @@ public class Controller {
 			participantPane.add(participantNameFields.get(i), 1, i);
 			participantPane.add(new Text("ID:"), 2, i);
 			participantPane.add(participantIdFields.get(i), 3, i);
-			participantPane.add(new ComboBox<String>(getOptions()), 4, i);
+			ComboBox<String> cb = new ComboBox<>(getOptions());
+			cb.getSelectionModel().select(cb.getItems().size()/2);
+			participantPane.add(cb, 4, i);
 		}	
 	}
 	
@@ -233,6 +241,7 @@ public class Controller {
 	private void setupTrackSpeedView() {
 		speedFields = new ArrayList<>();
 		rangeFields = new ArrayList<>();
+		estimateTimes = new HashMap<>();
 		trackSectionPane.getChildren().clear();
 		
 		for (ParticipantSpeed ps : speedBracketList) {
@@ -241,28 +250,45 @@ public class Controller {
 	}
 	
 	private void addTrackSpeedAndRange(ParticipantSpeed bracket) {
-		int size = trackSectionPane.getChildren().size()/4;
+		int size = trackSectionPane.getChildren().size()/6;
 		
 		trackSectionPane.add(new Text(bracket + " Speed"), 0, size);
 		
-		TextField speedField = new TextField("0");
+		TextField speedField = new TextField("100");
 		speedField.setPrefWidth(50);
 		speedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(bracket, i)));
 		speedFields.add(speedField);
 		trackSectionPane.add(speedField, 1, size);
 		
-		trackSectionPane.add(new Text(bracket + " Range:"), 2, size);
+		trackSectionPane.add(new Text(bracket + " Range"), 2, size);
 		
-		TextField rangeField = new TextField("0");
+		TextField rangeField = new TextField("100");
 		rangeField.setPrefWidth(50);
 		rangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(bracket, i)));
 		rangeFields.add(rangeField);
 		trackSectionPane.add(rangeField, 3, size);
+		
+		trackSectionPane.add(new Text(bracket + " Est. Finish"), 4, size);
+		
+		Text estimate = new Text(String.format("%.2f", controller.getLength()/bracket.getVelocity()));
+		estimateTimes.put(bracket, estimate);
+		trackSectionPane.add(estimate, 5, size);
 	}
 	
 	private void updateSpeedBracket(ParticipantSpeed speedBracket, double value) {
 		speedBracket.setVelocity(value);
+		estimateTimes.get(speedBracket).setText(String.format("%.2f", controller.getLength()/speedBracket.getVelocity()));
 		System.out.println(speedBracket + " Speed " + value);
+	}
+	
+	private void resetSpeedBrackets() {
+		ParticipantSpeed.FASTEST.setVelocity(100);
+		ParticipantSpeed.FASTER.setVelocity(100);
+		ParticipantSpeed.FAST.setVelocity(100);
+		ParticipantSpeed.MEDIUM.setVelocity(100);
+		ParticipantSpeed.SLOW.setVelocity(100);
+		ParticipantSpeed.SLOWER.setVelocity(100);
+		ParticipantSpeed.SLOWEST.setVelocity(100);
 	}
 	
 	private void updateRangeBracket(ParticipantSpeed speedBracket, double value) {

@@ -9,4 +9,6 @@ import model.track.Track;
 public abstract class TrackController {
 
 	public abstract Track getTrack();
+	
+	public abstract int getLength();
 }

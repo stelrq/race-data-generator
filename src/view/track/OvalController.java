@@ -16,7 +16,7 @@ import static java.lang.String.format;
  */
 public class OvalController extends TrackController {
 
-	private int distance;
+	private int myLength;
 
 	@FXML
 	private TextField distanceField;
@@ -41,11 +41,11 @@ public class OvalController extends TrackController {
 	public void initialize() {
 		xRatio = Integer.parseInt(xRatioField.textProperty().getValue());
 		yRatio = Integer.parseInt(yRatioField.textProperty().getValue());
-		distance = Integer.parseInt(distanceField.textProperty().getValue());
-		track = new OvalTrack(distance,xRatio,yRatio);
+		myLength = Integer.parseInt(distanceField.textProperty().getValue());
+		track = new OvalTrack(myLength,xRatio,yRatio);
 		onChange();
 		distanceField.textProperty().addListener(new IntListener(i -> {
-			distance = i;
+			myLength = i;
 			onChange();
 		}));
 		xRatioField.textProperty().addListener(new IntListener(i -> {
@@ -64,8 +64,12 @@ public class OvalController extends TrackController {
 		return track;
 	}
 	
+	public int getLength() {
+		return myLength;
+	}
+	
 	private void onChange() {
-		track = new OvalTrack(distance, xRatio, yRatio);
+		track = new OvalTrack(myLength, xRatio, yRatio);
 		widthLabel.setText(format("%.0f", track.getWidth()));
 		heightLabel.setText(format("%.0f", track.getHeight()));
 	}

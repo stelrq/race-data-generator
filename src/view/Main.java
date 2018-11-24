@@ -16,7 +16,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("305 Race Builder");
 		Parent s = FXMLLoader.load(getClass().getResource("Controller.fxml"));
-		Scene scene = new Scene(s, 1200, 650);
+		Scene scene = new Scene(s, 1600, 900);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

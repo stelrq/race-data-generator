@@ -14,8 +14,8 @@ public enum ParticipantSpeed {
 	private String myName;
 	
 	ParticipantSpeed(String name) {
-		myVelocity = 0;
-		myRange = 0;
+		myVelocity = 100;
+		myRange = 100;
 		myName = name;
 	}
 	
