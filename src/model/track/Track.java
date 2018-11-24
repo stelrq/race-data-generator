@@ -17,6 +17,10 @@ public abstract class Track {
 	public int getTrackLength() {
 		return trackLength;
 	}
+	
+	public abstract double getWidth();
+	
+	public abstract double getHeight();
 
 	public abstract SpeedClass getSpeedClass(double distance);
 

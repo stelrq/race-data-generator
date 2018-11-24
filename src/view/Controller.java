@@ -1,8 +1,12 @@
 package view;
 
+import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -21,12 +25,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -44,6 +52,9 @@ public class Controller {
 
 	@FXML
 	private Slider telemetryIntervalSlider;
+	
+	@FXML
+	private Slider trackSpeedSlider;
 
 	@FXML
 	private Text fileDisplay;
@@ -60,8 +71,8 @@ public class Controller {
 	@FXML
 	private BorderPane pane;
 
-	@FXML
-	private TextField lapTimeField;
+//	@FXML
+//	private TextField lapTimeField;
 
 	@FXML
 	private TextField numRacersField;
@@ -90,14 +101,14 @@ public class Controller {
 
 	private TrackController controller;
 
-	private List<String> linesToWrite = new ArrayList<String>();
+	private List<String> linesToWrite;
 
 	private int numLaps;
 	private int numRacers;
 	private int lapTime;
-	
-	private Map<ParticipantSpeed, Double> speedBracket;
-	private Map<ParticipantSpeed, Double> rangeBracket;
+	private int numSpeedBrackets;
+	private List<ParticipantSpeed> speedBracketList;
+	private Map<ParticipantSpeed, Text> estimateTimes;
 
 	/**
 	 * This is called when Controller.fxml is loaded by javafx, its essentially
@@ -105,12 +116,17 @@ public class Controller {
 	 */
 	@FXML
 	public void initialize() {
-		numLaps = DEFAULT_NUM_LAPS;
-		numRacers = DEFAULT_RACERS;
-		lapTime = DEFAULT_LAP_TIME;
+		linesToWrite = new ArrayList<>();
+		estimateTimes = new HashMap<>();
+		setUpTrackView();
 		
-		speedBracket = new HashMap<>();
-		rangeBracket = new HashMap<>();
+		numLaps = DEFAULT_NUM_LAPS;
+		//lapTime = DEFAULT_LAP_TIME;
+		numSpeedBrackets = (int) trackSpeedSlider.getValue();
+		setSpeedBracketList();
+		setupTrackSpeedView();
+		numRacers = Integer.parseInt(numRacersField.textProperty().getValue());
+		updateParticipantPane();
 
 		outputFile = new File(numLaps + "lap-" + numRacers + "racer-" + lapTime + "timeRace.rce");
 		try {
@@ -119,7 +135,7 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		setUpTrackView();
+		
 
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
@@ -127,23 +143,81 @@ public class Controller {
 		numRacersField.textProperty().addListener(new IntListener((i) -> {
 			numRacers = i;
 			updateParticipantPane();
-			System.out.println(numRacers);
-			
 		}));
+		
 		numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
-		lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
-		setupTrackSpeedView();
+		//lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
+		trackSpeedSlider.valueProperty().addListener((i,o,n) -> {
+			numSpeedBrackets = i.getValue().intValue();
+			resetSpeedBrackets();
+			setSpeedBracketList();
+			setupTrackSpeedView();
+			updateSpeedBracketComboBox();
+		});
+		
 		
 	}
 	
+	private void updateSpeedBracketComboBox() {
+		int num = 0;
+		List<Node> boxes = new ArrayList<>();
+		for (Node n : participantPane.getChildren()) {
+			if (n instanceof ComboBox) {
+				boxes.add(n);
+				num++;
+			}
+		}
+		
+		participantPane.getChildren().removeAll(boxes);
+		
+		for (int i = 0; i < num; i++) {
+			ComboBox<String> cb = new ComboBox<>(getOptions());
+			cb.getSelectionModel().select(cb.getItems().size()/2);
+			participantPane.add(cb, 4, i);
+		}
+	}
+
+	private void setSpeedBracketList() {
+		speedBracketList = new ArrayList<>();
+		switch (numSpeedBrackets) {
+		case 3:
+			speedBracketList.add(ParticipantSpeed.FAST);
+			speedBracketList.add(ParticipantSpeed.MEDIUM);
+			speedBracketList.add(ParticipantSpeed.SLOW);
+			break;
+		case 5:
+			speedBracketList.add(ParticipantSpeed.FASTER);
+			speedBracketList.add(ParticipantSpeed.FAST);
+			speedBracketList.add(ParticipantSpeed.MEDIUM);
+			speedBracketList.add(ParticipantSpeed.SLOW);
+			speedBracketList.add(ParticipantSpeed.SLOWER);
+			break;
+		case 7:
+			speedBracketList.add(ParticipantSpeed.FASTEST);
+			speedBracketList.add(ParticipantSpeed.FASTER);
+			speedBracketList.add(ParticipantSpeed.FAST);
+			speedBracketList.add(ParticipantSpeed.MEDIUM);
+			speedBracketList.add(ParticipantSpeed.SLOW);
+			speedBracketList.add(ParticipantSpeed.SLOWER);
+			speedBracketList.add(ParticipantSpeed.SLOWEST);
+		}
+	}
+
 	private void updateParticipantPane() {
 		participantNameFields = new ArrayList<>();
 		participantIdFields = new ArrayList<>();
 		participantPane.getChildren().clear();
+		Set<Integer> set = new HashSet<>();
+		while (set.size() < numRacers) {
+			set.add(rand.nextInt(100));
+		}
+		
+		Iterator<Integer> iter = set.iterator();
+		
 		for (int i = 0; i < numRacers; i++) {
-			TextField name = new TextField();
+			TextField name = new TextField(buildRacerName());
 			name.setPrefWidth(115);
-			TextField id = new TextField();
+			TextField id = new TextField(iter.next().toString());
 			id.setPrefWidth(35);
 			participantNameFields.add(name);
 			participantIdFields.add(id);
@@ -151,62 +225,75 @@ public class Controller {
 			participantPane.add(participantNameFields.get(i), 1, i);
 			participantPane.add(new Text("ID:"), 2, i);
 			participantPane.add(participantIdFields.get(i), 3, i);
+			ComboBox<String> cb = new ComboBox<>(getOptions());
+			cb.getSelectionModel().select(cb.getItems().size()/2);
+			participantPane.add(cb, 4, i);
 		}	
+	}
+	
+	private ObservableList<String> getOptions() {
+		return FXCollections
+				.observableArrayList(speedBracketList.stream()
+						.map((name) -> name.toString())
+						.collect(Collectors.toList()));
 	}
 	
 	private void setupTrackSpeedView() {
 		speedFields = new ArrayList<>();
 		rangeFields = new ArrayList<>();
+		estimateTimes = new HashMap<>();
+		trackSectionPane.getChildren().clear();
 		
-		trackSectionPane.add(new Text("Fast Speed:"), 0, 0);
-		TextField fastSpeedField = new TextField("0");
-		fastSpeedField.setPrefWidth(50);
-		fastSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.FAST)));
-		speedFields.add(fastSpeedField);
-		trackSectionPane.add(fastSpeedField, 1, 0);
-		
-		trackSectionPane.add(new Text("Fast Range:"), 2, 0);
-		TextField fastRangeField = new TextField("0");
-		fastRangeField.setPrefWidth(50);
-		fastRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.FAST)));
-		rangeFields.add(fastRangeField);
-		trackSectionPane.add(fastRangeField, 3, 0);
-		
-		trackSectionPane.add(new Text("Medium Speed:"), 0, 1);
-		TextField mediumSpeedField = new TextField("0");
-		mediumSpeedField.setPrefWidth(50);
-		mediumSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.MEDIUM)));
-		speedFields.add(mediumSpeedField);
-		trackSectionPane.add(mediumSpeedField, 1, 1);
-		
-		trackSectionPane.add(new Text("Medium Range:"), 2, 1);
-		TextField mediumRangeField = new TextField("0");
-		mediumRangeField.setPrefWidth(50);
-		mediumRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.MEDIUM)));
-		rangeFields.add(mediumRangeField);
-		trackSectionPane.add(mediumRangeField, 3, 1);
-		
-		trackSectionPane.add(new Text("Slow Speed:"), 0, 2);
-		TextField slowSpeedField = new TextField("0");
-		slowSpeedField.setPrefWidth(50);
-		slowSpeedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(ParticipantSpeed.SLOW)));
-		speedFields.add(slowSpeedField);
-		trackSectionPane.add(slowSpeedField, 1, 2);
-		
-		trackSectionPane.add(new Text("Slow Range:"), 2, 2);
-		TextField slowRangeField = new TextField("0");
-		slowRangeField.setPrefWidth(50);
-		slowRangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(ParticipantSpeed.SLOW)));
-		rangeFields.add(slowRangeField);
-		trackSectionPane.add(slowRangeField, 3, 2);
+		for (ParticipantSpeed ps : speedBracketList) {
+			addTrackSpeedAndRange(ps);
+		}
 	}
 	
-	private void updateSpeedBracket(ParticipantSpeed speedBracket) {
+	private void addTrackSpeedAndRange(ParticipantSpeed bracket) {
+		int size = trackSectionPane.getChildren().size()/6;
 		
+		trackSectionPane.add(new Text(bracket + " Speed"), 0, size);
+		
+		TextField speedField = new TextField("100");
+		speedField.setPrefWidth(50);
+		speedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(bracket, i)));
+		speedFields.add(speedField);
+		trackSectionPane.add(speedField, 1, size);
+		
+		trackSectionPane.add(new Text(bracket + " Range"), 2, size);
+		
+		TextField rangeField = new TextField("100");
+		rangeField.setPrefWidth(50);
+		rangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(bracket, i)));
+		rangeFields.add(rangeField);
+		trackSectionPane.add(rangeField, 3, size);
+		
+		trackSectionPane.add(new Text(bracket + " Est. Finish"), 4, size);
+		
+		Text estimate = new Text(String.format("%.2f", controller.getLength()/bracket.getVelocity()));
+		estimateTimes.put(bracket, estimate);
+		trackSectionPane.add(estimate, 5, size);
 	}
 	
-	private void updateRangeBracket(ParticipantSpeed speedBracket) {
-		
+	private void updateSpeedBracket(ParticipantSpeed speedBracket, double value) {
+		speedBracket.setVelocity(value);
+		estimateTimes.get(speedBracket).setText(String.format("%.2f", controller.getLength()/speedBracket.getVelocity()));
+		System.out.println(speedBracket + " Speed " + value);
+	}
+	
+	private void resetSpeedBrackets() {
+		ParticipantSpeed.FASTEST.setVelocity(100);
+		ParticipantSpeed.FASTER.setVelocity(100);
+		ParticipantSpeed.FAST.setVelocity(100);
+		ParticipantSpeed.MEDIUM.setVelocity(100);
+		ParticipantSpeed.SLOW.setVelocity(100);
+		ParticipantSpeed.SLOWER.setVelocity(100);
+		ParticipantSpeed.SLOWEST.setVelocity(100);
+	}
+	
+	private void updateRangeBracket(ParticipantSpeed speedBracket, double value) {
+		speedBracket.setRange(value);
+		System.out.println(speedBracket + " Range " + value);
 	}
 	
 	private void setUpTrackView() {
@@ -228,7 +315,22 @@ public class Controller {
 			e.printStackTrace();
 		}
 	}
+	
+	private String buildRacerName() {
+		int lowerA = 97; // ascii value of lowercase 'a'
+		int upperA = 65; // ascii value of uppercase 'A'
 
+		StringBuilder name = new StringBuilder();
+
+		name.append((char) (upperA + rand.nextInt(26))); // 26 letters in alphabet.
+		for (int i = 0; i < 8; i++) {
+			name.append((char) (lowerA + rand.nextInt(26)));
+		}
+
+		return name.toString();
+
+	}
+	
 	private void onSubmit() {
 		progressBar.setVisible(true);
 		SimTask task = new SimTask();
@@ -262,24 +364,30 @@ public class Controller {
 	}
 
 	private class SimTask extends Task<Void> {
-
 		@Override
 		protected Void call() throws Exception {
-
+			System.out.println("Begin");
 			int telemetryInterval = (int) telemetryIntervalSlider.getValue();
 			Track track = controller.getTrack();
 			List<Participant> participants = new ArrayList<>();
-			Set<Integer> ids = new HashSet<>();
-			while (ids.size() < numRacers) {
-				ids.add(rand.nextInt(100));
-			}
-			int start = 0;
+			List<Integer> ids = participantIdFields.stream()
+					.map((id) -> Integer.parseInt(id.textProperty().getValue()))
+					.collect(Collectors.toList());
+			List<String> names = participantNameFields.stream()
+					.map((name) -> name.textProperty().getValue())
+					.collect(Collectors.toList());
+			double start = 0;
+			//System.out.println(speedBracket);
+			//System.out.println(rangeBracket);
 			for (int id : ids) {
 				participants.add(new Participant(id, start, track.getTrackLength(), 
-						speedBracket.get(ParticipantSpeed.MEDIUM), speedBracket.get(ParticipantSpeed.MEDIUM)));
+						ParticipantSpeed.MEDIUM));
+				//System.out.println(id);
 			}
 			Race race = new Race(track, numLaps, telemetryInterval, participants);
-
+			System.out.println("race");
+			
+			
 			// Convert seconds to millis
 			int expectedTime = 1000 * lapTime * numLaps;
 
@@ -296,10 +404,13 @@ public class Controller {
 			linesToWrite.add("#TIME:" + expectedTime);
 			linesToWrite.add("#PARTICIPANTS:" + numRacers);
 
+			System.out.println("race2");
 			while (race.stillGoing()) {
+				System.out.println("going");
 				race.stepRace().forEach(linesToWrite::add);
 				currentTime++;
 				updateProgress(currentTime, expectedTime);
+				
 			}
 
 			adjustForLastRacer();

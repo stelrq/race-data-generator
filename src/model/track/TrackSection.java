@@ -26,7 +26,6 @@ public class TrackSection implements RaceConstraint {
 
 	@Override
 	public double applyContraint(double velocity) {
-		// TODO Auto-generated method stub
-		return 0;
+		return velocity * mySpeed.getMultiplier();
 	}
 }

@@ -66,8 +66,8 @@ public class OvalTrack extends Track {
 		sections.add(new TrackSection(TrackSpeed.MEDIUM, height*Math.PI/4));
 		sections.add(new TrackSection(TrackSpeed.FAST, width-height));
 		
-		double straightDist = getWidth(trackLength) - getHeight(trackLength);
-		double curveDistance = (getHeight(trackLength) * .5) * PI;
+		double straightDist = getWidth() - getHeight();
+		double curveDistance = (getHeight() * .5) * PI;
 		firstTurn = (curveDistance / 2);
 		secondTurn = curveDistance;
 		frontStraightAway = curveDistance + straightDist;
@@ -89,12 +89,12 @@ public class OvalTrack extends Track {
 	 *
 	 *
 	 */
-	public static double getWidth(int distance) {
-		return distance / (2.0 * (PI + 1));
+	public double getWidth() {
+		return width;
 	}
 
-	public static double getHeight(int distance) {
-		return .5 * getWidth(distance);
+	public double getHeight() {
+		return height;
 	}
 
 }

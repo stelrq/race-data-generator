@@ -43,7 +43,7 @@ public class Race {
 			messages.addAll(setUpMessages());
 		}
 		for (Participant participant : participants) {
-			participant.step(track.getSpeedClass(participant.getPosition()));
+			participant.step();
 
 			if (lastMessageTime.get(participant) % timeSlice == 0) {
 				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getPosition(),
