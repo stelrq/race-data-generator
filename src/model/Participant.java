@@ -22,10 +22,6 @@ public class Participant implements Comparable<Participant> {
 	private int myLapNum;
 	private int myTrackLength;
 	private Map<String, RaceConstraint> myConstraints;
-
-	public Participant(int id, double startDistance, int trackLength, ParticipantSpeed speed) {
-		this(id, buildRacerName(), startDistance, trackLength, speed);
-	}
 	
 	public Participant(int id, String name, double startDistance, int trackLength, ParticipantSpeed speed) {
 		myID = id;

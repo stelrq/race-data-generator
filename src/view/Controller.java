@@ -78,9 +78,6 @@ public class Controller {
 	private TextField numRacersField;
 
 	@FXML
-	private GridPane participantPane;
-
-	@FXML
 	private GridPane trackSectionPane;
 
 	@FXML
@@ -89,11 +86,11 @@ public class Controller {
 	@FXML
 	private List<TextField> rangeFields;
 
-	@FXML
-	private List<TextField> participantNameFields;
+	private List<ParticipantDisplay> participantDisplays;
+	
+	private ScrollPane myParticipantScrollPane;
 
-	@FXML
-	private List<TextField> participantIdFields;
+	private GridPane myParticipantPane;
 
 	public ProgressBar progressBar;
 
@@ -117,6 +114,7 @@ public class Controller {
 	@FXML
 	public void initialize() {
 		linesToWrite = new ArrayList<>();
+		participantDisplays = new ArrayList<>();
 		estimateTimes = new HashMap<>();
 		setUpTrackView();
 
@@ -126,7 +124,8 @@ public class Controller {
 		setSpeedBracketList();
 		setupTrackSpeedView();
 		numRacers = Integer.parseInt(numRacersField.textProperty().getValue());
-		updateParticipantPane();
+		
+		setUpParticipantPane();
 
 		outputFile = new File(numLaps + "lap-" + numRacers + "racer-" + lapTime + "timeRace.rce");
 		try {
@@ -138,10 +137,13 @@ public class Controller {
 		outputFileButton.setOnAction(event -> chooseFile());
 		submitRace.setOnAction(event -> onSubmit());
 
-		numRacersField.textProperty().addListener(new IntListener((i) -> {
+		final IntListener racerNumListener = new IntListener((i) -> {
 			numRacers = i;
 			updateParticipantPane();
-		}));
+		});
+		numRacersField.textProperty().addListener(racerNumListener);
+		// Force the new IntListener to update
+		racerNumListener.changed(numRacersField.textProperty(), "", Integer.toString(numRacers));
 
 		numLapsField.textProperty().addListener(new IntListener((i) -> numLaps = i));
 		// lapTimeField.textProperty().addListener(new IntListener((i) -> lapTime = i));
@@ -155,22 +157,35 @@ public class Controller {
 
 	}
 
+	private void setUpParticipantPane() {
+		// Instantiation
+		myParticipantScrollPane = new ScrollPane();
+		myParticipantPane = new GridPane();
+
+		// Formatting
+		myParticipantScrollPane.setPrefHeight(pane.getHeight());
+
+		// Adding
+		myParticipantScrollPane.setContent(myParticipantPane);
+		pane.setRight(myParticipantScrollPane);		
+	}
+
 	private void updateSpeedBracketComboBox() {
 		int num = 0;
 		List<Node> boxes = new ArrayList<>();
-		for (Node n : participantPane.getChildren()) {
+		for (Node n : myParticipantPane.getChildren()) {
 			if (n instanceof ComboBox) {
 				boxes.add(n);
 				num++;
 			}
 		}
 
-		participantPane.getChildren().removeAll(boxes);
+		myParticipantPane.getChildren().removeAll(boxes);
 
 		for (int i = 0; i < num; i++) {
 			ComboBox<String> cb = new ComboBox<>(getOptions());
 			cb.getSelectionModel().select(cb.getItems().size() / 2);
-			participantPane.add(cb, 4, i);
+			myParticipantPane.add(cb, 4, i);
 		}
 	}
 
@@ -201,31 +216,31 @@ public class Controller {
 	}
 
 	private void updateParticipantPane() {
-		participantNameFields = new ArrayList<>();
-		participantIdFields = new ArrayList<>();
-		participantPane.getChildren().clear();
-		Set<Integer> set = new HashSet<>();
-		while (set.size() < numRacers) {
-			set.add(rand.nextInt(100));
-		}
-
-		Iterator<Integer> iter = set.iterator();
+		participantDisplays.clear();
+		myParticipantPane.getChildren().clear();
+		
 
 		for (int i = 0; i < numRacers; i++) {
-			TextField name = new TextField(buildRacerName());
-			name.setPrefWidth(115);
-			TextField id = new TextField(iter.next().toString());
-			id.setPrefWidth(35);
-			participantNameFields.add(name);
-			participantIdFields.add(id);
-			participantPane.add(new Text("Name:"), 0, i);
-			participantPane.add(participantNameFields.get(i), 1, i);
-			participantPane.add(new Text("ID:"), 2, i);
-			participantPane.add(participantIdFields.get(i), 3, i);
-			ComboBox<String> cb = new ComboBox<>(getOptions());
-			cb.getSelectionModel().select(cb.getItems().size() / 2);
-			participantPane.add(cb, 4, i);
+			ParticipantDisplay newPartDisp = new ParticipantDisplay();
+			participantDisplays.add(newPartDisp);
+			myParticipantPane.add(newPartDisp, 0, i);
+			
+			
+//			TextField name = new TextField(buildRacerName());
+//			name.setPrefWidth(115);
+//			TextField id = new TextField(iter.next().toString());
+//			id.setPrefWidth(35);
+//			participantNameFields.add(name);
+//			participantIdFields.add(id);
+//			participantPane.add(new Text("Name:"), 0, i);
+//			participantPane.add(participantNameFields.get(i), 1, i);
+//			participantPane.add(new Text("ID:"), 2, i);
+//			participantPane.add(participantIdFields.get(i), 3, i);
+//			ComboBox<String> cb = new ComboBox<>(getOptions());
+//			cb.getSelectionModel().select(cb.getItems().size() / 2);
+//			participantPane.add(cb, 4, i);
 		}
+		myParticipantPane.setPrefWidth(new ParticipantDisplay().getPrefWidth());
 	}
 
 	private ObservableList<String> getOptions() {
@@ -367,15 +382,17 @@ public class Controller {
 				int telemetryInterval = (int) telemetryIntervalSlider.getValue();
 				Track track = controller.getTrack();
 				List<Participant> participants = new ArrayList<>();
-				List<Integer> ids = participantIdFields.stream()
-						.map((id) -> Integer.parseInt(id.textProperty().getValue())).collect(Collectors.toList());
-				List<String> names = participantNameFields.stream().map((name) -> name.textProperty().getValue())
-						.collect(Collectors.toList());
+//				List<Integer> ids = participantIdFields.stream()
+//						.map((id) -> Integer.parseInt(id.textProperty().getValue())).collect(Collectors.toList());
+//				List<String> names = participantNameFields.stream().map((name) -> name.textProperty().getValue())
+//						.collect(Collectors.toList());
+				
+				
 				double start = 0;
 				// System.out.println(speedBracket);
 				// System.out.println(rangeBracket);
-				for (int id : ids) {
-					participants.add(new Participant(id, start, track.getTrackLength(), ParticipantSpeed.MEDIUM));
+				for (ParticipantDisplay pd : participantDisplays) {
+					participants.add(new Participant(pd.getID(), pd.getName(), start, track.getTrackLength(), ParticipantSpeed.MEDIUM));
 					// System.out.println(id);
 				}
 				Race race = new Race(track, numLaps, telemetryInterval, participants);
