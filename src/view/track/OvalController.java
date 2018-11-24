@@ -32,26 +32,42 @@ public class OvalController extends TrackController {
 
 	@FXML
 	private Text heightLabel;
+	
+	private int xRatio;
+	private int yRatio;
+	private Track track;
 
 	@FXML
 	public void initialize() {
-		onDistanceChange(Integer.parseInt(distanceField.textProperty().getValue()));
-		distanceField.textProperty().addListener(new IntListener(this::onDistanceChange));
-
+		xRatio = Integer.parseInt(xRatioField.textProperty().getValue());
+		yRatio = Integer.parseInt(yRatioField.textProperty().getValue());
+		distance = Integer.parseInt(distanceField.textProperty().getValue());
+		track = new OvalTrack(distance,xRatio,yRatio);
+		onChange();
+		distanceField.textProperty().addListener(new IntListener(i -> {
+			distance = i;
+			onChange();
+		}));
+		xRatioField.textProperty().addListener(new IntListener(i -> {
+			xRatio = i;
+			onChange();
+		}));
+		yRatioField.textProperty().addListener(new IntListener(i -> {
+			yRatio = i;
+			onChange();
+		}));
+		
 	}
 
 	@Override
 	public Track getTrack() {
-		return new OvalTrack(distance,5,2);
+		return track;
 	}
-
-	private void onDistanceChange(int dist) {
-		distance = dist;
-		double width = OvalTrack.getWidth(distance);
-		double height = OvalTrack.getHeight(distance);
-
-		widthLabel.setText(format("%.0f", width));
-		heightLabel.setText(format("%.0f", height));
+	
+	private void onChange() {
+		track = new OvalTrack(distance, xRatio, yRatio);
+		widthLabel.setText(format("%.0f", track.getWidth()));
+		heightLabel.setText(format("%.0f", track.getHeight()));
 	}
 
 }

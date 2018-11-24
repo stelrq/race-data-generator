@@ -24,16 +24,18 @@ public class Participant implements Comparable<Participant> {
 	private Map<String, RaceConstraint> myConstraints;
 
 	public Participant(int id, double startDistance, int trackLength, ParticipantSpeed speed) {
+		this(id, buildRacerName(), startDistance, trackLength, speed);
+	}
+	
+	public Participant(int id, String name, double startDistance, int trackLength, ParticipantSpeed speed) {
 		myID = id;
-		System.out.println(id);
-		myName = buildRacerName();
+		myName = name;
 		myPosition = startDistance;
 		mySpeedBracket = speed;
 		myVelocity = mySpeedBracket.getVelocity();
 		myAcceleration = 0;
 		myTrackLength = trackLength;
 		myConstraints = new HashMap<>();
-		
 	}
 
 	public double step(SpeedClass speedClass) {
@@ -53,6 +55,11 @@ public class Participant implements Comparable<Participant> {
 		}
 		
 		myPosition += velocity;
+		
+		if (myPosition >= myTrackLength) {
+			myLapNum++;
+			myPosition -= myTrackLength;
+		}
 		
 		return myPosition;
 	}
@@ -100,7 +107,7 @@ public class Participant implements Comparable<Participant> {
 	 *
 	 * @return Random string like "Akdkdjfk"
 	 */
-	private String buildRacerName() {
+	private static String buildRacerName() {
 		int lowerA = 97; // ascii value of lowercase 'a'
 		int upperA = 65; // ascii value of uppercase 'A'
 
