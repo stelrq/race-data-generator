@@ -90,7 +90,7 @@ public class Controller {
 
 	private TrackController controller;
 
-	private List<String> linesToWrite = new ArrayList<String>();
+	private List<String> linesToWrite;
 
 	private int numLaps;
 	private int numRacers;
@@ -105,6 +105,8 @@ public class Controller {
 	 */
 	@FXML
 	public void initialize() {
+		linesToWrite = new ArrayList<>();
+		
 		numLaps = DEFAULT_NUM_LAPS;
 		numRacers = DEFAULT_RACERS;
 		lapTime = DEFAULT_LAP_TIME;
@@ -262,10 +264,9 @@ public class Controller {
 	}
 
 	private class SimTask extends Task<Void> {
-
 		@Override
 		protected Void call() throws Exception {
-
+			System.out.println("Begin");
 			int telemetryInterval = (int) telemetryIntervalSlider.getValue();
 			Track track = controller.getTrack();
 			List<Participant> participants = new ArrayList<>();
@@ -273,13 +274,18 @@ public class Controller {
 			while (ids.size() < numRacers) {
 				ids.add(rand.nextInt(100));
 			}
-			int start = 0;
+			double start = 0;
+			System.out.println(speedBracket);
+			System.out.println(rangeBracket);
 			for (int id : ids) {
 				participants.add(new Participant(id, start, track.getTrackLength(), 
-						speedBracket.get(ParticipantSpeed.MEDIUM), speedBracket.get(ParticipantSpeed.MEDIUM)));
+						ParticipantSpeed.MEDIUM));
+				System.out.println(id);
 			}
 			Race race = new Race(track, numLaps, telemetryInterval, participants);
-
+			
+			
+			
 			// Convert seconds to millis
 			int expectedTime = 1000 * lapTime * numLaps;
 

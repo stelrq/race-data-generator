@@ -1,7 +1,9 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import static java.lang.Math.ceil;
 
@@ -14,22 +16,24 @@ public class Participant implements Comparable<Participant> {
 	private int myID;
 	private String myName;
 	private double myPosition;
+	private ParticipantSpeed mySpeedBracket;
 	private double myVelocity;
-	private double myRange;
 	private double myAcceleration;	
 	private int myLapNum;
 	private int myTrackLength;
-	private List<RaceConstraint> myConstraints;
+	private Map<String, RaceConstraint> myConstraints;
 
-	public Participant(int id, double startDistance, int trackLength, double velocity, double range) {
+	public Participant(int id, double startDistance, int trackLength, ParticipantSpeed speed) {
 		myID = id;
+		System.out.println(id);
 		myName = buildRacerName();
 		myPosition = startDistance;
-		myVelocity = velocity;
-		myRange = range;
+		mySpeedBracket = speed;
+		myVelocity = mySpeedBracket.getVelocity();
 		myAcceleration = 0;
 		myTrackLength = trackLength;
-		myConstraints = new ArrayList<>();
+		myConstraints = new HashMap<>();
+		
 	}
 
 	public double step(SpeedClass speedClass) {
@@ -44,8 +48,8 @@ public class Participant implements Comparable<Participant> {
 	
 	public double step() {
 		double velocity = myVelocity;
-		for (RaceConstraint rc : myConstraints) {
-			velocity = rc.applyContraint(velocity);
+		for (String condition : myConstraints.keySet()) {
+			velocity = myConstraints.get(condition).applyContraint(velocity);
 		}
 		
 		myPosition += velocity;
@@ -53,16 +57,12 @@ public class Participant implements Comparable<Participant> {
 		return myPosition;
 	}
 
-	public void addConstraint(RaceConstraint rc) {
-		myConstraints.add(rc);
+	public void addConstraint(String key, RaceConstraint rc) {
+		myConstraints.put(key, rc);
 	}
 	
-	public void removeConstraint(RaceConstraint rc) {
-		myConstraints.remove(rc);
-	}
-	
-	public void removeConstraint(int index) {
-		myConstraints.remove(index);
+	public void removeConstraint(String key) {
+		myConstraints.remove(key);
 	}
 	
 	public double getPosition() {
