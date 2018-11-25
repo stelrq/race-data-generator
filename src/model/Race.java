@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import model.track.Track;
+import race_constraints.AccelerationConstraint;
+import race_constraints.DecelerationConstraint;
+import race_constraints.TrackSectionConstraint;
 
 import static java.lang.String.format;
 import static java.util.Collections.sort;
@@ -20,21 +23,24 @@ public class Race {
 	private int time;
 	private Random rng;
 	private Map<Participant, Integer> lastMessageTime;
+	private List<Participant> participantsNotFinished;
 	
-	
+	// Global Acceleration and Deceleration constraints to use for Participants
+	private AccelerationConstraint myAccelerationConstraint = new AccelerationConstraint(0.05);
+	private DecelerationConstraint myDecelerationConstraint = new DecelerationConstraint(0.05);
+
 	private final int timeSlice;
 
-	
-
-	public Race(Track track, int numLaps, int telemetryInterval,
-			List<Participant> participants) {
+	public Race(Track track, int numLaps, int telemetryInterval, List<Participant> participants) {
 		this.track = track;
 		this.numLaps = numLaps;
 		this.participants = participants;
 		time = 0;
 		timeSlice = telemetryInterval;
 		lastMessageTime = new HashMap<>();
-		
+		participantsNotFinished = new ArrayList<>();
+		participantsNotFinished.addAll(participants);
+
 		// fix for now so lastMessageTime starts populated
 		for (int i = 0; i < participants.size(); i++) {
 			lastMessageTime.put(participants.get(i), 0);
@@ -43,11 +49,15 @@ public class Race {
 	}
 
 	public List<String> stepRace() {
+//		System.out.println("Stepping race: " + time + " " + participants);
 		List<String> messages = new ArrayList<>();
 		if (time == 0) {
 			messages.addAll(setUpMessages());
 		}
 		for (Participant participant : participants) {
+			// Evaluate constraints
+			evaluateConstraints(participant);
+
 			participant.step();
 
 			if (lastMessageTime.get(participant) % timeSlice == 0) {
@@ -62,16 +72,51 @@ public class Race {
 		return messages;
 	}
 
+	private void evaluateConstraints(Participant participant) {
+		final double participantDistance = participant.getPosition();
+		// Add the appropriate track constraint
+		participant.addConstraint("track", new TrackSectionConstraint(track.getTrackSpeed(participant.getPosition())));
+		
+		// Determine if Acceleration/Deceleration is necessary
+		// if ((Roughly the speed we have to be at the next gate)
+		// - (Roughly the speed we're going now)) <= 
+		double speedDifference = track.getNextTrackSpeed(participantDistance).getMultiplier() * participant.getVelocity() 
+				- track.getTrackSpeed(participantDistance).getMultiplier() * participant.getVelocity();
+		
+		if (speedDifference > 0) {
+			if (speedDifference <= track.getDistanceUntilNextTrackPiece(participantDistance) / myAccelerationConstraint.getAcceleration()) {
+				participant.addConstraint("Acceleration", myAccelerationConstraint);
+			}
+		} else if (speedDifference < 0) {
+			if (-speedDifference <= track.getDistanceUntilNextTrackPiece(participantDistance) / myDecelerationConstraint.getDeceleration()) {
+				participant.addConstraint("Acceleration", myDecelerationConstraint);
+			}
+		}
+		
+		if (track.getDistanceUntilNextTrackPiece(participantDistance) <= 5) {
+			participant.removeConstraint("Acceleration");
+			participant.setVelocity(ParticipantSpeed.MEDIUM.getVelocity());
+		}
+	}
+
 	private List<String> setUpMessages() {
-		List<String> returnList = participants.stream().map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getPosition())
+		List<String> returnList = participants.stream()
+				.map(r -> "#" + r.getRacerId() + ":" + r.getName() + ":" + r.getPosition())
 				.collect(Collectors.toList());
-		returnList.add("$L:0:" + participants.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
+		returnList.add("$L:0:"
+				+ participants.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":")));
 		return returnList;
 
 	}
 
 	public boolean stillGoing() {
-		return participants.stream().map(Participant::getLapNum).anyMatch((l) -> l < numLaps);
+		for (int i = 0; i < participants.size(); i++) {
+			if (participants.get(i).getLapNum() < numLaps) {
+				return true;
+			}
+		}
+		return false;
+//		return participants.stream().map(Participant::getLapNum).anyMatch((l) -> l < numLaps);
 	}
 
 	private Optional<String> newLeaderBoard() {
@@ -81,21 +126,24 @@ public class Race {
 			return Optional.empty();
 		} else {
 			String leaderBoard = "$L:" + time + ":";
-			leaderBoard += participants.stream().map(Participant::getRacerId).map(Object::toString).collect(joining(":"));
+			leaderBoard += participants.stream().map(Participant::getRacerId).map(Object::toString)
+					.collect(joining(":"));
 			return Optional.of(leaderBoard);
 		}
 	}
 
 	private List<String> crossingMessages() {
-
+		List<Participant> participantstoRemove = new ArrayList<>();
 		List<String> messages = new ArrayList<>();
-		for (Participant r : participants) {
-			if (r.timeUntilCrossingFinish() <= 1) {
-				double crossTime = time + r.timeUntilCrossingFinish();
-				int newLap = r.getLapNum() + 1;
-				messages.add(format("$C:%.2f:%s:%d:%b", crossTime, r.getRacerId(), newLap, newLap == numLaps));
+		for (Participant p : participantsNotFinished) {
+			if (p.getLapNum() == numLaps) {
+				double crossTime = time;
+				messages.add(
+						format("$C:%.2f:%s:%d:%b", crossTime, p.getRacerId(), p.getLapNum(), p.getLapNum() == numLaps));
+				participantstoRemove.add(p);
 			}
 		}
+		participantsNotFinished.removeAll(participantstoRemove);
 		return messages;
 
 	}

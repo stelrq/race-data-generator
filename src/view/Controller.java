@@ -191,28 +191,31 @@ public class Controller {
 
 	private void setSpeedBracketList() {
 		speedBracketList = new ArrayList<>();
-		switch (numSpeedBrackets) {
-		case 3:
-			speedBracketList.add(ParticipantSpeed.FAST);
-			speedBracketList.add(ParticipantSpeed.MEDIUM);
-			speedBracketList.add(ParticipantSpeed.SLOW);
-			break;
-		case 5:
-			speedBracketList.add(ParticipantSpeed.FASTER);
-			speedBracketList.add(ParticipantSpeed.FAST);
-			speedBracketList.add(ParticipantSpeed.MEDIUM);
-			speedBracketList.add(ParticipantSpeed.SLOW);
-			speedBracketList.add(ParticipantSpeed.SLOWER);
-			break;
-		case 7:
-			speedBracketList.add(ParticipantSpeed.FASTEST);
-			speedBracketList.add(ParticipantSpeed.FASTER);
-			speedBracketList.add(ParticipantSpeed.FAST);
-			speedBracketList.add(ParticipantSpeed.MEDIUM);
-			speedBracketList.add(ParticipantSpeed.SLOW);
-			speedBracketList.add(ParticipantSpeed.SLOWER);
-			speedBracketList.add(ParticipantSpeed.SLOWEST);
-		}
+//		switch (numSpeedBrackets) {
+//		case 3:
+//			speedBracketList.add(ParticipantSpeed.FAST);
+//			speedBracketList.add(ParticipantSpeed.MEDIUM);
+//			speedBracketList.add(ParticipantSpeed.SLOW);
+//			break;
+//		case 5:
+//			speedBracketList.add(ParticipantSpeed.FASTER);
+//			speedBracketList.add(ParticipantSpeed.FAST);
+//			speedBracketList.add(ParticipantSpeed.MEDIUM);
+//			speedBracketList.add(ParticipantSpeed.SLOW);
+//			speedBracketList.add(ParticipantSpeed.SLOWER);
+//			break;
+//		case 7:
+//			speedBracketList.add(ParticipantSpeed.FASTEST);
+//			speedBracketList.add(ParticipantSpeed.FASTER);
+//			speedBracketList.add(ParticipantSpeed.FAST);
+//			speedBracketList.add(ParticipantSpeed.MEDIUM);
+//			speedBracketList.add(ParticipantSpeed.SLOW);
+//			speedBracketList.add(ParticipantSpeed.SLOWER);
+//			speedBracketList.add(ParticipantSpeed.SLOWEST);
+//		}
+		speedBracketList.add(ParticipantSpeed.FAST);
+		speedBracketList.add(ParticipantSpeed.MEDIUM);
+		speedBracketList.add(ParticipantSpeed.SLOW);
 	}
 
 	private void updateParticipantPane() {
@@ -264,15 +267,15 @@ public class Controller {
 
 		trackSectionPane.add(new Text(bracket + " Speed"), 0, size);
 
-		TextField speedField = new TextField("100");
+		TextField speedField = new TextField(Double.toString(bracket.getVelocity()));
 		speedField.setPrefWidth(50);
 		speedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(bracket, i)));
 		speedFields.add(speedField);
 		trackSectionPane.add(speedField, 1, size);
 
-		trackSectionPane.add(new Text(bracket + " Range"), 2, size);
+		trackSectionPane.add(new Text(bracket + " Range (+/-)"), 2, size);
 
-		TextField rangeField = new TextField("100");
+		TextField rangeField = new TextField(Double.toString(bracket.getRange()));
 		rangeField.setPrefWidth(50);
 		rangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(bracket, i)));
 		rangeFields.add(rangeField);
@@ -280,7 +283,7 @@ public class Controller {
 
 		trackSectionPane.add(new Text(bracket + " Est. Finish"), 4, size);
 
-		Text estimate = new Text(String.format("%.2f", controller.getLength() / bracket.getVelocity()));
+		Text estimate = new Text(String.format("%.2f", controller.getLength() / bracket.getVelocity() / 1000));
 		estimateTimes.put(bracket, estimate);
 		trackSectionPane.add(estimate, 5, size);
 	}
@@ -293,13 +296,13 @@ public class Controller {
 	}
 
 	private void resetSpeedBrackets() {
-		ParticipantSpeed.FASTEST.setVelocity(100);
-		ParticipantSpeed.FASTER.setVelocity(100);
-		ParticipantSpeed.FAST.setVelocity(100);
+//		ParticipantSpeed.FASTEST.setVelocity(100);
+//		ParticipantSpeed.FASTER.setVelocity(100);
+		ParticipantSpeed.FAST.setVelocity(110);
 		ParticipantSpeed.MEDIUM.setVelocity(100);
-		ParticipantSpeed.SLOW.setVelocity(100);
-		ParticipantSpeed.SLOWER.setVelocity(100);
-		ParticipantSpeed.SLOWEST.setVelocity(100);
+		ParticipantSpeed.SLOW.setVelocity(90);
+//		ParticipantSpeed.SLOWER.setVelocity(100);
+//		ParticipantSpeed.SLOWEST.setVelocity(100);
 	}
 
 	private void updateRangeBracket(ParticipantSpeed speedBracket, double value) {
@@ -325,21 +328,6 @@ public class Controller {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private String buildRacerName() {
-		int lowerA = 97; // ascii value of lowercase 'a'
-		int upperA = 65; // ascii value of uppercase 'A'
-
-		StringBuilder name = new StringBuilder();
-
-		name.append((char) (upperA + rand.nextInt(26))); // 26 letters in alphabet.
-		for (int i = 0; i < 8; i++) {
-			name.append((char) (lowerA + rand.nextInt(26)));
-		}
-
-		return name.toString();
-
 	}
 
 	private void onSubmit() {
@@ -392,14 +380,15 @@ public class Controller {
 				// System.out.println(speedBracket);
 				// System.out.println(rangeBracket);
 				for (ParticipantDisplay pd : participantDisplays) {
-					participants.add(new Participant(pd.getID(), pd.getName(), start, track.getTrackLength(), ParticipantSpeed.MEDIUM));
+					participants.add(new Participant(pd.getID(), pd.getName(), start, track.getTrackLength(), pd.getSpeed()));
 					// System.out.println(id);
 				}
 				Race race = new Race(track, numLaps, telemetryInterval, participants);
 				System.out.println("race");
 
 				// Convert seconds to millis
-				int expectedTime = 1000 * lapTime * numLaps;
+				int expectedTime = track.getTrackLength() / 10;
+				System.out.println( track.getTrackLength() + " " + numLaps + " " + expectedTime + " EXPECTED");
 
 				int currentTime = 0;
 				linesToWrite.add("#RACE:" + raceName.getText());
@@ -407,8 +396,8 @@ public class Controller {
 
 				// TODO These are hard coded values, make things in the UI to
 				// change this.
-				linesToWrite.add("#WIDTH:5");
-				linesToWrite.add("#HEIGHT:4");
+				linesToWrite.add("#WIDTH:" + track.getWidthRatio());
+				linesToWrite.add("#HEIGHT:" + track.getHeightRatio());
 
 				linesToWrite.add("#DISTANCE:" + track.getTrackLength());
 				linesToWrite.add("#TIME:" + expectedTime);
@@ -416,7 +405,7 @@ public class Controller {
 
 				System.out.println("race2");
 				while (race.stillGoing()) {
-					System.out.println("going");
+//					System.out.println("going");
 					race.stepRace().forEach(linesToWrite::add);
 					currentTime++;
 					updateProgress(currentTime, expectedTime);

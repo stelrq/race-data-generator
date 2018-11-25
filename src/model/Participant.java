@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import race_constraints.ParticipantConstraint;
+
 import static java.lang.Math.ceil;
 
 /**
@@ -18,39 +21,39 @@ public class Participant implements Comparable<Participant> {
 	private double myPosition;
 	private ParticipantSpeed mySpeedBracket;
 	private double myVelocity;
-	private double myAcceleration;	
 	private int myLapNum;
 	private int myTrackLength;
-	private Map<String, RaceConstraint> myConstraints;
+	private Map<String, ParticipantConstraint> myConstraints;
 	
 	public Participant(int id, String name, double startDistance, int trackLength, ParticipantSpeed speed) {
 		myID = id;
 		myName = name;
 		myPosition = startDistance;
 		mySpeedBracket = speed;
-		myVelocity = mySpeedBracket.getVelocity();
-		myAcceleration = 0;
+		myVelocity = speed.getVelocity();
 		myTrackLength = trackLength;
 		myConstraints = new HashMap<>();
 	}
 
-	public double step(SpeedClass speedClass) {
-		changeSpeed(speedClass);
-		myPosition += myVelocity;
-		if (myPosition >= myTrackLength) {
-			myLapNum++;
-			myPosition -= myTrackLength;
-		}
-		return myPosition;
-	}
+//	public double step(SpeedClass speedClass) {
+//		changeSpeed(speedClass);
+//		myPosition += myVelocity;
+//		if (myPosition >= myTrackLength) {
+//			myLapNum++;
+//			myPosition -= myTrackLength;
+//		}
+//		return myPosition;
+//	}
 	
 	public double step() {
 		double velocity = myVelocity;
 		for (String condition : myConstraints.keySet()) {
-			velocity = myConstraints.get(condition).applyContraint(velocity);
+			velocity = myConstraints.get(condition).applyConstraint(velocity, mySpeedBracket);
 		}
 		
 		myPosition += velocity;
+		// This causes a problem where accelerations compound and we don't want that but we need some way for acceleration to compound
+//		myVelocity = velocity;
 		
 		if (myPosition >= myTrackLength) {
 			myLapNum++;
@@ -60,7 +63,7 @@ public class Participant implements Comparable<Participant> {
 		return myPosition;
 	}
 
-	public void addConstraint(String key, RaceConstraint rc) {
+	public void addConstraint(String key, ParticipantConstraint rc) {
 		myConstraints.put(key, rc);
 	}
 	
@@ -75,6 +78,10 @@ public class Participant implements Comparable<Participant> {
 	public int getLapNum() {
 		return myLapNum;
 	}
+	
+	public void setVelocity(double myVelocity) {
+		this.myVelocity = myVelocity;
+	}
 
 	/**
 	 *
@@ -86,9 +93,9 @@ public class Participant implements Comparable<Participant> {
 	 * Math: (based on Y = mx+b) D = st + d D - d = st (D - d) / s = t
 	 *
 	 */
-	public double timeUntilCrossingFinish() {
-		return (myTrackLength - myPosition) / myVelocity;
-	}
+//	public double timeUntilCrossingFinish() {
+//		return (myTrackLength *  - myPosition) / myVelocity;
+//	}
 
 	private void changeSpeed(SpeedClass speedClass) {
 //		if (speedClass != lastSpeed) {
@@ -140,5 +147,9 @@ public class Participant implements Comparable<Participant> {
 
 	public String getName() {
 		return myName;
+	}
+	
+	public double getVelocity() {
+		return myVelocity;
 	}
 }

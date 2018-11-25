@@ -30,7 +30,7 @@ public class ParticipantDisplay extends GridPane {
 
 	private TextField myRacerIDField;
 	private TextField myNameTextField;
-	private ComboBox<String> mySpeedComboBox;
+	private ComboBox<ParticipantSpeed> mySpeedComboBox;
 
 	
 	public ParticipantDisplay() {
@@ -39,12 +39,12 @@ public class ParticipantDisplay extends GridPane {
 		
 		myRacerIDField = new TextField(
 				((Integer) (myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER)).toString());
-		ObservableList<String> options = FXCollections.observableArrayList();
+		ObservableList<ParticipantSpeed> options = FXCollections.observableArrayList();
 		
 		for (int i = 0; i < ParticipantSpeed.values().length; i++) {
-			options.add(ParticipantSpeed.values()[i].toString());
+			options.add(ParticipantSpeed.values()[i]);
 		}
-		mySpeedComboBox = new ComboBox<String>(options);
+		mySpeedComboBox = new ComboBox<ParticipantSpeed>(options);
 		mySpeedComboBox.getSelectionModel().select(myRandom.nextInt(options.size()));;		
 		
 		// Formatting
@@ -69,7 +69,7 @@ public class ParticipantDisplay extends GridPane {
 		return Integer.parseInt(myRacerIDField.getText());
 	}
 	
-	public String getSpeed() {
+	public ParticipantSpeed getSpeed() {
 		return mySpeedComboBox.getSelectionModel().getSelectedItem();
 	}
 

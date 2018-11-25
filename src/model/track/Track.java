@@ -21,8 +21,16 @@ public abstract class Track {
 	public abstract double getWidth();
 	
 	public abstract double getHeight();
+	
+	public abstract int getHeightRatio();
+	
+	public abstract int getWidthRatio();
 
-	public abstract SpeedClass getSpeedClass(double distance);
+	public abstract TrackSpeed getTrackSpeed(double distance);
+	
+	public abstract TrackSpeed getNextTrackSpeed(double distance);
+	
+	public abstract double getDistanceUntilNextTrackPiece(double distance);
 
 	public abstract String getTrackName();
 

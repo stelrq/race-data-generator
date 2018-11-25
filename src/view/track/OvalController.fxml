@@ -10,7 +10,7 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml"
 	fx:controller="view.track.OvalController">
 	<fx:define>
-		<Integer fx:id="DEFAULT_TRACK_LENGTH" fx:value="5000" />
+		<Integer fx:id="DEFAULT_TRACK_LENGTH" fx:value="500000" />
 		<Integer fx:id="DEFAULT_X_RATIO" fx:value="2" />
 		<Integer fx:id="DEFAULT_Y_RATIO" fx:value="1" />
 	</fx:define>
