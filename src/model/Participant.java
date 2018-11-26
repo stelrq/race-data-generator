@@ -15,6 +15,10 @@ import static java.lang.Math.ceil;
  * @author Myles Haynes, Peter Bae
  */
 public class Participant implements Comparable<Participant> {
+	public static final double DEFAULT_ACCELERATION = 0.005;
+	public static final double DEFAULT_DECELERATION = 0.005;
+	
+	
 	private static Random rng = new Random();	
 	private int myID;
 	private String myName;
@@ -62,6 +66,10 @@ public class Participant implements Comparable<Participant> {
 		
 		return myPosition;
 	}
+	
+	public ParticipantSpeed getParticipantSpeed() {
+		return mySpeedBracket;
+	}
 
 	public void addConstraint(String key, ParticipantConstraint rc) {
 		myConstraints.put(key, rc);
@@ -69,6 +77,10 @@ public class Participant implements Comparable<Participant> {
 	
 	public void removeConstraint(String key) {
 		myConstraints.remove(key);
+	}
+	
+	public boolean hasConstraint(String key) {
+		return myConstraints.containsKey(key);
 	}
 	
 	public double getPosition() {

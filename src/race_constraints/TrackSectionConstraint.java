@@ -22,7 +22,7 @@ public class TrackSectionConstraint implements ParticipantConstraint {
 	@Override
 	public double applyConstraint(double velocity, ParticipantSpeed theSpeed) {
 //		System.out.println("SPEED CHANGED, " + velocity + " before " + velocity * mySpeed.getMultiplier() + " after");
-		System.out.println(mySpeed);
+//		System.out.println(mySpeed);
 		return velocity * mySpeed.getMultiplier();
 	}
 }

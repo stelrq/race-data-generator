@@ -3,6 +3,8 @@ package model;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sun.javafx.css.CalculatedValue;
+
 import model.track.Track;
 import race_constraints.AccelerationConstraint;
 import race_constraints.DecelerationConstraint;
@@ -24,10 +26,6 @@ public class Race {
 	private Random rng;
 	private Map<Participant, Integer> lastMessageTime;
 	private List<Participant> participantsNotFinished;
-	
-	// Global Acceleration and Deceleration constraints to use for Participants
-	private AccelerationConstraint myAccelerationConstraint = new AccelerationConstraint(0.05);
-	private DecelerationConstraint myDecelerationConstraint = new DecelerationConstraint(0.05);
 
 	private final int timeSlice;
 
@@ -56,9 +54,16 @@ public class Race {
 		}
 		for (Participant participant : participants) {
 			// Evaluate constraints
+			double lastDistance = participant.getPosition();
 			evaluateConstraints(participant);
 
 			participant.step();
+
+			// We passed a gate, remove acceleration
+			if (track.getDistanceUntilNextTrackPiece(participant.getPosition()) > track
+					.getDistanceUntilNextTrackPiece(lastDistance)) {
+				participant.removeConstraint("Acceleration");
+			}
 
 			if (lastMessageTime.get(participant) % timeSlice == 0) {
 				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getPosition(),
@@ -76,27 +81,54 @@ public class Race {
 		final double participantDistance = participant.getPosition();
 		// Add the appropriate track constraint
 		participant.addConstraint("track", new TrackSectionConstraint(track.getTrackSpeed(participant.getPosition())));
-		
+
 		// Determine if Acceleration/Deceleration is necessary
 		// if ((Roughly the speed we have to be at the next gate)
-		// - (Roughly the speed we're going now)) <= 
-		double speedDifference = track.getNextTrackSpeed(participantDistance).getMultiplier() * participant.getVelocity() 
-				- track.getTrackSpeed(participantDistance).getMultiplier() * participant.getVelocity();
-		
-		if (speedDifference > 0) {
-			if (speedDifference <= track.getDistanceUntilNextTrackPiece(participantDistance) / myAccelerationConstraint.getAcceleration()) {
-				participant.addConstraint("Acceleration", myAccelerationConstraint);
-			}
-		} else if (speedDifference < 0) {
-			if (-speedDifference <= track.getDistanceUntilNextTrackPiece(participantDistance) / myDecelerationConstraint.getDeceleration()) {
-				participant.addConstraint("Acceleration", myDecelerationConstraint);
+		// - (Roughly the speed we're going now)) <=
+		if (!participant.hasConstraint("Acceleration")) {
+			double speedDifference = track.getNextTrackSpeed(participantDistance).getMultiplier()
+					* participant.getParticipantSpeed().getVelocity()
+					- track.getTrackSpeed(participantDistance).getMultiplier()
+							* participant.getParticipantSpeed().getVelocity();
+
+//			// make acceleration more drawn out.
+//			speedDifference *= 1000;
+
+			if (speedDifference > 0) {
+				if (track.getDistanceUntilNextTrackPiece(participantDistance) <= calculateDistanceForAcceleration(
+						track.getTrackSpeed(participantDistance).getMultiplier()
+								* participant.getParticipantSpeed().getVelocity(),
+						track.getNextTrackSpeed(participantDistance).getMultiplier()
+								* participant.getParticipantSpeed().getVelocity(), Participant.DEFAULT_ACCELERATION)) {
+					
+					System.out.println("added acceleration " + track.getDistanceUntilNextTrackPiece(participantDistance) + " we are this far away " + calculateDistanceForAcceleration(
+							track.getTrackSpeed(participantDistance).getMultiplier()
+							* participant.getParticipantSpeed().getVelocity(),
+					track.getNextTrackSpeed(participantDistance).getMultiplier()
+							* participant.getParticipantSpeed().getVelocity(), Participant.DEFAULT_ACCELERATION) + " calculated distance we will travel " + (participant.getParticipantSpeed().getVelocity() * track.getTrackSpeed(participantDistance).getMultiplier()) + " current velocity " + track.getNextTrackSpeed(participantDistance).getMultiplier() * participant.getParticipantSpeed().getVelocity() + " velocity we have to be ");
+					
+					participant.addConstraint("Acceleration",
+							new AccelerationConstraint(Participant.DEFAULT_ACCELERATION,
+									participant.getParticipantSpeed().getVelocity(), speedDifference, 10000));
+				}
+			} else if (speedDifference < 0) {
+				if (track.getDistanceUntilNextTrackPiece(participantDistance)
+						/ Participant.DEFAULT_DECELERATION <= -speedDifference) {
+					participant.addConstraint("Acceleration", new DecelerationConstraint(
+							Participant.DEFAULT_DECELERATION, participant.getParticipantSpeed().getVelocity()));
+				}
 			}
 		}
+	}
+
+	private double calculateDistanceForAcceleration(double initialVelocity, double finalVelocity, double acceleration) {
+		// t = (vf - vi) /
+		//         a
+		double t = ((finalVelocity - initialVelocity) / acceleration);
 		
-		if (track.getDistanceUntilNextTrackPiece(participantDistance) <= 5) {
-			participant.removeConstraint("Acceleration");
-			participant.setVelocity(ParticipantSpeed.MEDIUM.getVelocity());
-		}
+		// s = vi*t + (1/2)*a*t^2
+		final double s = initialVelocity * t + 0.5 * acceleration * Math.pow(t, 2);
+		return s;
 	}
 
 	private List<String> setUpMessages() {

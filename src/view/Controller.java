@@ -359,7 +359,7 @@ public class Controller {
 		// Modify the time to be this new value
 		linesToWrite.set(5, "#TIME:" + raceActuallyOver);
 
-		System.out.println(raceActuallyOver);
+//		System.out.println(raceActuallyOver);
 	}
 
 	private class SimTask extends Task<Void> {

@@ -1,19 +1,22 @@
 package race_constraints;
 
+import model.Participant;
 import model.ParticipantSpeed;
 
 public class DecelerationConstraint implements ParticipantConstraint {
 
 	private double myDeceleration;
+	private double myCompoundingVelocity;
 	
-	public DecelerationConstraint(double theDeceleration) {
+	public DecelerationConstraint(double theDeceleration, double theStartingVelocity) {
 		myDeceleration = theDeceleration;
+		myCompoundingVelocity = theStartingVelocity;
 	}
 	
 	@Override
 	public double applyConstraint(double velocity, ParticipantSpeed theSpeed) {
-		double decelPercentage = ((velocity - myDeceleration) / velocity);
-		return velocity - myDeceleration;
+		myCompoundingVelocity -= Participant.DEFAULT_ACCELERATION;
+		return myCompoundingVelocity;
 	}
 	
 	public double getDeceleration() {
