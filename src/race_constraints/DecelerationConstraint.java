@@ -15,8 +15,9 @@ public class DecelerationConstraint implements ParticipantConstraint {
 	
 	@Override
 	public double applyConstraint(double velocity, ParticipantSpeed theSpeed) {
-		myCompoundingVelocity -= Participant.DEFAULT_ACCELERATION;
-		return myCompoundingVelocity;
+		myCompoundingVelocity -= myDeceleration;
+		double ratio = myCompoundingVelocity / velocity;
+		return velocity * ratio;
 	}
 	
 	public double getDeceleration() {

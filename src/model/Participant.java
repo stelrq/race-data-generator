@@ -15,8 +15,8 @@ import static java.lang.Math.ceil;
  * @author Myles Haynes, Peter Bae
  */
 public class Participant implements Comparable<Participant> {
-	public static final double DEFAULT_ACCELERATION = 0.005;
-	public static final double DEFAULT_DECELERATION = 0.005;
+	public static final double DEFAULT_ACCELERATION = 0.001;
+	public static final double DEFAULT_DECELERATION = 0.001;
 	
 	
 	private static Random rng = new Random();	

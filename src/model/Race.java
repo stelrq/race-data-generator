@@ -99,23 +99,46 @@ public class Race {
 						track.getTrackSpeed(participantDistance).getMultiplier()
 								* participant.getParticipantSpeed().getVelocity(),
 						track.getNextTrackSpeed(participantDistance).getMultiplier()
-								* participant.getParticipantSpeed().getVelocity(), Participant.DEFAULT_ACCELERATION)) {
-					
-					System.out.println("added acceleration " + track.getDistanceUntilNextTrackPiece(participantDistance) + " we are this far away " + calculateDistanceForAcceleration(
-							track.getTrackSpeed(participantDistance).getMultiplier()
-							* participant.getParticipantSpeed().getVelocity(),
-					track.getNextTrackSpeed(participantDistance).getMultiplier()
-							* participant.getParticipantSpeed().getVelocity(), Participant.DEFAULT_ACCELERATION) + " calculated distance we will travel " + (participant.getParticipantSpeed().getVelocity() * track.getTrackSpeed(participantDistance).getMultiplier()) + " current velocity " + track.getNextTrackSpeed(participantDistance).getMultiplier() * participant.getParticipantSpeed().getVelocity() + " velocity we have to be ");
-					
-					participant.addConstraint("Acceleration",
-							new AccelerationConstraint(Participant.DEFAULT_ACCELERATION,
-									participant.getParticipantSpeed().getVelocity(), speedDifference, 10000));
+								* participant.getParticipantSpeed().getVelocity(),
+						Participant.DEFAULT_ACCELERATION)) {
+
+					System.out
+							.println(
+									"added acceleration " + track.getDistanceUntilNextTrackPiece(participantDistance)
+											+ " we are this far away "
+											+ calculateDistanceForAcceleration(
+													track.getTrackSpeed(participantDistance).getMultiplier()
+															* participant.getParticipantSpeed().getVelocity(),
+													track.getNextTrackSpeed(participantDistance).getMultiplier()
+															* participant.getParticipantSpeed().getVelocity(),
+													Participant.DEFAULT_ACCELERATION)
+											+ " calculated distance we will travel "
+											+ (participant.getParticipantSpeed().getVelocity()
+													* track.getTrackSpeed(participantDistance).getMultiplier())
+											+ " current velocity "
+											+ track.getNextTrackSpeed(participantDistance).getMultiplier()
+													* participant.getParticipantSpeed().getVelocity()
+											+ " velocity we have to be ");
+
+					participant
+							.addConstraint("Acceleration",
+									new AccelerationConstraint(Participant.DEFAULT_ACCELERATION,
+											track.getTrackSpeed(participantDistance).getMultiplier()
+													* participant.getParticipantSpeed().getVelocity(),
+											speedDifference, 10000));
 				}
 			} else if (speedDifference < 0) {
-				if (track.getDistanceUntilNextTrackPiece(participantDistance)
-						/ Participant.DEFAULT_DECELERATION <= -speedDifference) {
-					participant.addConstraint("Acceleration", new DecelerationConstraint(
-							Participant.DEFAULT_DECELERATION, participant.getParticipantSpeed().getVelocity()));
+				if (track.getDistanceUntilNextTrackPiece(participantDistance) <= calculateDistanceForAcceleration(
+						track.getNextTrackSpeed(participantDistance).getMultiplier()
+								* participant.getParticipantSpeed().getVelocity(),
+						track.getTrackSpeed(participantDistance).getMultiplier()
+								* participant.getParticipantSpeed().getVelocity(),
+						Participant.DEFAULT_DECELERATION)) {
+
+					participant.addConstraint("Acceleration",
+							new DecelerationConstraint(Participant.DEFAULT_DECELERATION,
+									track.getTrackSpeed(participantDistance).getMultiplier()
+											* participant.getParticipantSpeed().getVelocity()));
 				}
 			}
 		}
@@ -123,9 +146,9 @@ public class Race {
 
 	private double calculateDistanceForAcceleration(double initialVelocity, double finalVelocity, double acceleration) {
 		// t = (vf - vi) /
-		//         a
+		// a
 		double t = ((finalVelocity - initialVelocity) / acceleration);
-		
+
 		// s = vi*t + (1/2)*a*t^2
 		final double s = initialVelocity * t + 0.5 * acceleration * Math.pow(t, 2);
 		return s;
