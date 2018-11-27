@@ -3,9 +3,9 @@ package model;
 public enum ParticipantSpeed {
 //	FASTEST("Fastest"),
 //	FASTER("Faster"),
-	FAST("Fast", 11, 0.1),
-	MEDIUM("Medium", 10, 0.1),
-	SLOW("Slow", 9, 0.1);
+	FAST("Fast", 10.75, 1),
+	MEDIUM("Medium", 10, 1),
+	SLOW("Slow", 9.25, 1);
 //	SLOWER("Slower"),
 //	SLOWEST("Slowest");
 	

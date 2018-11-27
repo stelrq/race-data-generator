@@ -15,26 +15,27 @@ import static java.lang.Math.ceil;
  * @author Myles Haynes, Peter Bae
  */
 public class Participant implements Comparable<Participant> {
-	public static final double DEFAULT_ACCELERATION = 0.001;
-	public static final double DEFAULT_DECELERATION = 0.001;
-	
-	
-	private static Random rng = new Random();	
+	public static final double DEFAULT_ACCELERATION = 0.0015;
+	public static final double DEFAULT_DECELERATION = 0.002;
+
+	private static Random rng = new Random();
 	private int myID;
 	private String myName;
 	private double myPosition;
 	private ParticipantSpeed mySpeedBracket;
 	private double myVelocity;
+	private double myNextVelocity;
 	private int myLapNum;
 	private int myTrackLength;
 	private Map<String, ParticipantConstraint> myConstraints;
-	
+
 	public Participant(int id, String name, double startDistance, int trackLength, ParticipantSpeed speed) {
 		myID = id;
 		myName = name;
 		myPosition = startDistance;
 		mySpeedBracket = speed;
-		myVelocity = speed.getVelocity();
+		myVelocity = speed.getNewVelocity();
+		myNextVelocity = speed.getNewVelocity();
 		myTrackLength = trackLength;
 		myConstraints = new HashMap<>();
 	}
@@ -48,25 +49,26 @@ public class Participant implements Comparable<Participant> {
 //		}
 //		return myPosition;
 //	}
-	
+
 	public double step() {
 		double velocity = myVelocity;
 		for (String condition : myConstraints.keySet()) {
 			velocity = myConstraints.get(condition).applyConstraint(velocity, mySpeedBracket);
 		}
-		
+
 		myPosition += velocity;
-		// This causes a problem where accelerations compound and we don't want that but we need some way for acceleration to compound
+		// This causes a problem where accelerations compound and we don't want that but
+		// we need some way for acceleration to compound
 //		myVelocity = velocity;
-		
+
 		if (myPosition >= myTrackLength) {
 			myLapNum++;
 			myPosition -= myTrackLength;
 		}
-		
+
 		return myPosition;
 	}
-	
+
 	public ParticipantSpeed getParticipantSpeed() {
 		return mySpeedBracket;
 	}
@@ -74,15 +76,15 @@ public class Participant implements Comparable<Participant> {
 	public void addConstraint(String key, ParticipantConstraint rc) {
 		myConstraints.put(key, rc);
 	}
-	
+
 	public void removeConstraint(String key) {
 		myConstraints.remove(key);
 	}
-	
+
 	public boolean hasConstraint(String key) {
 		return myConstraints.containsKey(key);
 	}
-	
+
 	public double getPosition() {
 		return myPosition;
 	}
@@ -90,9 +92,19 @@ public class Participant implements Comparable<Participant> {
 	public int getLapNum() {
 		return myLapNum;
 	}
-	
+
 	public void setVelocity(double myVelocity) {
 		this.myVelocity = myVelocity;
+	}
+
+	// Whenever a participant crosses a gate we need to randomly select the next
+	// speed it is going to go.
+	public void calculateNextVelocity() {
+		myNextVelocity = mySpeedBracket.getNewVelocity();
+	}
+	
+	public double getNextVelocity() {
+		return myNextVelocity;
 	}
 
 	/**
@@ -160,7 +172,7 @@ public class Participant implements Comparable<Participant> {
 	public String getName() {
 		return myName;
 	}
-	
+
 	public double getVelocity() {
 		return myVelocity;
 	}

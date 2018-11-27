@@ -11,6 +11,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import model.ParticipantSpeed;
 
+
+// TODO implement checks to make sure duplicate names or racer ID's can't be entered
 public class ParticipantDisplay extends GridPane {
 
 	private static final Random myRandom = new Random();

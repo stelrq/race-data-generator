@@ -7,15 +7,10 @@ public class AccelerationConstraint implements ParticipantConstraint {
 
 	private double myAcceleration;
 	private double myCompoundingVelocity;
-	private double percentage;
-	private double mySpeedDifference;
-	private int constraintCounter;
 	
-	public AccelerationConstraint(double theAcceleration, double theStartingVelocity, double speedDifference, double distanceStartedAccelerating) {
+	public AccelerationConstraint(double theAcceleration, double theStartingVelocity) {
 		myAcceleration = theAcceleration;
 		myCompoundingVelocity = theStartingVelocity;
-		mySpeedDifference = speedDifference;
-		percentage = 0;
 	}
 	
 	@Override
