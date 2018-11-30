@@ -3,33 +3,30 @@ package model.track;
 public enum TrackSpeed {
 //	FASTEST,
 //	FASTER,
-	FAST(1.5, 0.01),
-	MEDIUM(1.0, 0.01),
-	SLOW(0.5, 0.01);
+	FAST(1.5, "Fast"), 
+	MEDIUM(1.0, "Medium"), 
+	SLOW(0.5, "Slow");
 //	SLOWER,
 //	SLOWEST;
-	
+
 	private double multiplier;
-	private double variance;
-	
-	TrackSpeed(double theMultiplier, double theVariance) {
+	private String myName;
+
+	TrackSpeed(double theMultiplier, String theName) {
 		multiplier = theMultiplier;
-		variance = theVariance;
+		myName = theName;
 	}
-	
+
 	public void setMultiplier(double mult) {
 		multiplier = mult;
 	}
-	
-	public void setVariance(double var) {
-		variance = var;
-	}
-	
+
 	public double getMultiplier() {
 		return multiplier;
 	}
 	
-	public double getVariance() {
-		return variance;
+	@Override
+	public String toString() {
+		return myName;
 	}
 }

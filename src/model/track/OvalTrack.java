@@ -9,6 +9,7 @@ import static model.track.TrackSpeed.MEDIUM;
 import static model.track.TrackSpeed.FAST;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,9 +25,9 @@ public class OvalTrack extends Track {
 	private double height;
 
 	// Hard coded speeds for the sections of the track traversing the track
-	// counterclockwise starting with first turn, second turn, back straightaway,
+	// counterclockwise starting with first turn, second turn, back straight away,
 	// etc...
-	private TrackSpeed[] trackSpeeds = { SLOW, MEDIUM, FAST, SLOW, MEDIUM, FAST };
+	private TrackSpeed[] trackSpeeds = new TrackSpeed[6];
 
 	private double frontStraightAway;
 	private double firstTurn;
@@ -54,7 +55,7 @@ public class OvalTrack extends Track {
 	@Override
 	public TrackSpeed getNextTrackSpeed(double distance) {
 		// Get the speed then add 1 to it to get the next track speed in the array.
-		int desiredIndex = (int)getSpeedIndexAndNextGate(distance)[0] + 1;
+		int desiredIndex = (int) getSpeedIndexAndNextGate(distance)[0] + 1;
 
 		// Make sure the array wraps
 		desiredIndex = desiredIndex % trackSpeeds.length;
@@ -147,6 +148,14 @@ public class OvalTrack extends Track {
 	@Override
 	public int getWidthRatio() {
 		return xRatio;
+	}
+
+	@Override
+	public void setSections(List<TrackSpeed> theSpeeds) {
+		Object[] tempArr = theSpeeds.toArray();
+		for (int i = 0; i < tempArr.length; i++) {
+			trackSpeeds[i] = (TrackSpeed) tempArr[i];
+		}		
 	}
 
 }

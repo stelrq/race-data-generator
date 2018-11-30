@@ -1,5 +1,7 @@
 package view;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javafx.collections.FXCollections;
@@ -9,13 +11,22 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import model.Participant;
 import model.ParticipantSpeed;
 
-
-// TODO implement checks to make sure duplicate names or racer ID's can't be entered
 public class ParticipantDisplay extends GridPane {
 
 	private static final Random myRandom = new Random();
+
+	private static final List<String> USED_NAMES = new ArrayList<>();
+	
+	private static final List<Integer> USED_IDS = new ArrayList<>();
+	
+	/** The lower bound for random Participant IDs (inclusive) */
+	private static final int DEFAULT_ID_LOWER = 1;
+	
+	/** The upper bound for random Participant IDs (inclusive) */
+	private static final int DEFAULT_ID_UPPER = 99;
 	
 	private static final String[] DEFAULT_NAMES = { "Rebecka", "Lexie", "Betsey", "Elane", "Miss", "Daniele", "Angele",
 			"Aja", "Floretta", "Patrice", "Jamison", "Myles", "Sally", "Viola", "Delicia", "Dwain", "Alfredia", "Mina",
@@ -24,31 +35,37 @@ public class ParticipantDisplay extends GridPane {
 			"Evia", "Lorine", "Blanche", "Carita", "Perry", "Isela", "Yelena", "Florrie", "Angelica", "Kiyoko", "Kelli",
 			"Stacie" };
 
-	/** The lower bound for random Participant IDs (inclusive) */
-	private static final int DEFAULT_ID_LOWER = 1;
-
-	/** The upper bound for random Participant IDs (inclusive) */
-	private static final int DEFAULT_ID_UPPER = 99;
-
 	private TextField myRacerIDField;
 	private TextField myNameTextField;
 	private ComboBox<ParticipantSpeed> mySpeedComboBox;
 
-	
+	// TODO implement checks to make sure there aren't duplicates in default names
+	// and id's (check somewhere else to see if the user entered duplicate names or
+	// ID's
 	public ParticipantDisplay() {
-		// Instantiation / setting default random values
-		myNameTextField = new TextField(DEFAULT_NAMES[myRandom.nextInt(DEFAULT_NAMES.length)]);
-		
-		myRacerIDField = new TextField(
-				((Integer) (myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER)).toString());
-		ObservableList<ParticipantSpeed> options = FXCollections.observableArrayList();
-		
-		for (int i = 0; i < ParticipantSpeed.values().length; i++) {
-			options.add(ParticipantSpeed.values()[i]);
+		// Generate new unique name and ID
+		String name = DEFAULT_NAMES[myRandom.nextInt(DEFAULT_NAMES.length)];
+		int id = myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER;
+				
+		while (USED_NAMES.contains(name)) {
+			name = DEFAULT_NAMES[myRandom.nextInt(DEFAULT_NAMES.length)];
 		}
-		mySpeedComboBox = new ComboBox<ParticipantSpeed>(options);
-		mySpeedComboBox.getSelectionModel().select(myRandom.nextInt(options.size()));;		
+		while (USED_IDS.contains(id)) {
+			id = myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER;
+		}
 		
+		USED_NAMES.add(name);
+		USED_IDS.add(id);
+		
+		// Instantiation
+		myNameTextField = new TextField(name);
+		myRacerIDField = new TextField(Integer.toString(id));
+		ObservableList<ParticipantSpeed> options = FXCollections.observableArrayList();
+
+		options.addAll(ParticipantSpeed.values());
+		mySpeedComboBox = new ComboBox<ParticipantSpeed>(options);
+		mySpeedComboBox.getSelectionModel().select(myRandom.nextInt(options.size()));
+
 		// Formatting
 		myRacerIDField.setPrefColumnCount(2);
 		myNameTextField.setPrefColumnCount(10);
@@ -63,14 +80,19 @@ public class ParticipantDisplay extends GridPane {
 		add(mySpeedComboBox, 4, 0);
 	}
 	
+	public static void clearNamesAndIDS() {
+		USED_NAMES.clear();
+		USED_IDS.clear();
+	}
+
 	public String getName() {
 		return myNameTextField.textProperty().get();
 	}
-	
+
 	public int getID() {
 		return Integer.parseInt(myRacerIDField.getText());
 	}
-	
+
 	public ParticipantSpeed getSpeed() {
 		return mySpeedComboBox.getSelectionModel().getSelectedItem();
 	}

@@ -1,5 +1,7 @@
 package model.track;
 
+import java.util.List;
+
 import model.SpeedClass;
 
 /**
@@ -17,6 +19,8 @@ public abstract class Track {
 	public int getTrackLength() {
 		return trackLength;
 	}
+	
+	public abstract void setSections(List<TrackSpeed> theSpeeds);
 	
 	public abstract double getWidth();
 	

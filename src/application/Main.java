@@ -1,8 +1,6 @@
 package application;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import view.Controller;
@@ -14,12 +12,13 @@ import view.Controller;
 public class Main extends Application {
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("305 Race Builder");
-		Parent s = FXMLLoader.load(Controller.class.getResource("Controller.fxml"));
-		Scene scene = new Scene(s, 1600, 900);
-		primaryStage.setScene(scene);
-		primaryStage.show();
+	public void start(Stage stage) throws Exception {
+		stage.setTitle("305 Race Builder");
+		Controller c = new Controller();
+		Scene scene = new Scene(c);
+		stage.setScene(scene);
+		stage.centerOnScreen();
+		stage.show();
 	}
 
 	public static void main(String[] args) {
