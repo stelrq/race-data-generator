@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import model.track.TrackSpeed;
 import race_constraints.ParticipantConstraint;
+import race_constraints.TrackSectionConstraint;
 
 import static java.lang.Math.ceil;
 

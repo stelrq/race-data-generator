@@ -236,7 +236,7 @@ public class Controller extends BorderPane {
 				+ "NOTE: The race only ends when the last participant finishes their last lap!"));
 		numRacersField.setTooltip(new Tooltip("The number of participants in the race\n"
 				+ "NOTE: Max value of 30 racers right now"));
-		raceNameField.setTooltip(new Tooltip("The name of the race, does not effect anything in the race"));
+		raceNameField.setTooltip(new Tooltip("The name of the race, does not effect anything in the race other than the name in the file"));
 		trackLengthField.setTooltip(new Tooltip("The distance of one lap of the race in arbitrary units\n"
 				+ "This number is kind of like centimeters or inches in the real world because racers travel their speed around this distance every millisecond\n"
 				+ "Smaller number = racers appearing to move a lot faster on the screen\n"
@@ -695,9 +695,10 @@ public class Controller extends BorderPane {
 				// System.out.println(speedBracket);
 				// System.out.println(rangeBracket);
 				for (ParticipantDisplay pd : participantDisplays) {
-					participants.add(
-							new Participant(pd.getID(), pd.getName(), start, myTrack.getTrackLength(), pd.getSpeed()));
-					// System.out.println(id);
+					Participant p = new Participant(pd.getID(), pd.getName(), start, myTrack.getTrackLength(), pd.getSpeed());
+					p.calculateNextVelocity();
+					participants.add(p);
+					start -= (double) myTrack.getTrackLength() * 0.01;
 				}
 
 				// Get speeds from combo boxes

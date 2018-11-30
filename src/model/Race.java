@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import model.track.Track;
+import model.track.TrackSpeed;
 import race_constraints.AccelerationConstraint;
 import race_constraints.TrackSectionConstraint;
 
@@ -120,7 +121,13 @@ public class Race {
 							-Participant.DEFAULT_DECELERATION,
 							track.getTrackSpeed(participantDistance).getMultiplier() * participant.getVelocity()));
 				}
+			} else if (participantDistance < 0) {
+				participant.addConstraint("Acceleration", new AccelerationConstraint(Participant.DEFAULT_ACCELERATION, TrackSpeed.SLOW.getMultiplier() * participant.getVelocity()));
 			}
+		}
+		
+		if (participantDistance < 0) {
+			participant.addConstraint("track", new TrackSectionConstraint(TrackSpeed.SLOW));
 		}
 	}
 
