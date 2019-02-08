@@ -17,6 +17,8 @@ import static java.util.stream.Collectors.joining;
  * @author Myles Haynes, Peter Bae
  */
 public class Race {
+	
+	private static final Random myRand = new Random();
 	private final Track track;
 	private List<Participant> participants;
 	private final int numLaps;
@@ -49,6 +51,7 @@ public class Race {
 		List<String> messages = new ArrayList<>();
 		if (time == 0) {
 			messages.addAll(setUpMessages());
+			System.out.println(messages);
 		}
 		for (Participant participant : participants) {
 			// Evaluate constraints
@@ -70,7 +73,8 @@ public class Race {
 				participant.calculateNextVelocity();
 			}
 
-			if (lastMessageTime.get(participant) % timeSlice == 0) {
+			// Add some granularity so telemetry doesn't all come in on the same timestamp for all racers.
+			if (myRand.nextInt(timeSlice) + 1 == 1 || time == 0) {
 				messages.add(format("$T:%d:%s:%.2f:%d", time, participant.getRacerId(), participant.getPosition(),
 						participant.getLapNum()));
 			}
