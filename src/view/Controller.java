@@ -117,8 +117,6 @@ public class Controller extends BorderPane {
 
     private List<ComboBox<TrackSpeed>> myTrackSectionComboBoxes;
 
-//	private TrackController controller;
-
     private List<String> linesToWrite;
 
     private int numLaps;
@@ -198,14 +196,17 @@ public class Controller extends BorderPane {
         numLapsField.setTooltip(ToolTips.createTooltip(ToolTips.NUM_LAPS));
         numRacersField.setTooltip(ToolTips.createTooltip(ToolTips.NUM_RACERS));
         raceNameField.setTooltip(ToolTips.createTooltip(ToolTips.RACE_NAME));
-        trackLengthField.setTooltip(ToolTips.createTooltip(ToolTips.TRACK_LENGTH));
+        trackLengthField
+                .setTooltip(ToolTips.createTooltip(ToolTips.TRACK_LENGTH));
         xRatioField.setTooltip(ToolTips.createTooltip(ToolTips.X_RATIO));
         yRatioField.setTooltip(ToolTips.createTooltip(ToolTips.Y_RATIO));
         for (int i = 0; i < myTrackSectionComboBoxes.size(); i++) {
-            myTrackSectionComboBoxes.get(i).setTooltip(ToolTips.createTooltip(ToolTips.TRACK_SECTION));
+            myTrackSectionComboBoxes.get(i)
+                    .setTooltip(ToolTips.createTooltip(ToolTips.TRACK_SECTION));
         }
         for (int i = 0; i < trackSpeedMultiplierFields.size(); i++) {
-            trackSpeedMultiplierFields.get(i).setTooltip(ToolTips.createTooltip(ToolTips.TRACK_SPEED));
+            trackSpeedMultiplierFields.get(i)
+                    .setTooltip(ToolTips.createTooltip(ToolTips.TRACK_SPEED));
         }
 
     }
@@ -533,37 +534,6 @@ public class Controller extends BorderPane {
         }
         myParticipantPane.setPrefWidth(new ParticipantDisplay().getPrefWidth());
     }
-
-//	private ObservableList<String> getOptions() {
-//		return FXCollections.observableArrayList(
-//				speedBracketList.stream().map((name) -> name.toString()).collect(Collectors.toList()));
-//	}
-
-//	private void resetSpeedBrackets() {
-//		ParticipantSpeed.FASTEST.setVelocity(100);
-//		ParticipantSpeed.FASTER.setVelocity(100);
-//		ParticipantSpeed.FAST.setVelocity(110);
-//		ParticipantSpeed.MEDIUM.setVelocity(100);
-//		ParticipantSpeed.SLOW.setVelocity(90);
-//		ParticipantSpeed.SLOWER.setVelocity(100);
-//		ParticipantSpeed.SLOWEST.setVelocity(100);
-//	}
-
-//	private void updateRangeBracket(ParticipantSpeed speedBracket, double value) {
-//		speedBracket.setRange(value);
-//		System.out.println(speedBracket + " Range " + value);
-//	}
-
-//	private void setUpTrackView() {
-//		try {
-//			FXMLLoader loader = new FXMLLoader(OvalController.class.getResource("OvalController.fxml"));
-//			innerPane.setCenter(loader.load());
-//			setCenter(innerPane);
-//			controller = loader.getController();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
 
     private void chooseFile() {
         FileChooser chooser = new FileChooser();

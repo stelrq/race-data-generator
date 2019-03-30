@@ -1,6 +1,15 @@
 package model;
 
-import java.util.*;
+import static java.lang.String.format;
+import static java.util.Collections.sort;
+import static java.util.stream.Collectors.joining;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import model.track.Track;
@@ -8,16 +17,12 @@ import model.track.TrackSpeed;
 import race_constraints.AccelerationConstraint;
 import race_constraints.TrackSectionConstraint;
 
-import static java.lang.String.format;
-import static java.util.Collections.sort;
-import static java.util.stream.Collectors.joining;
-
 /**
  *
  * @author Myles Haynes, Peter Bae
  */
 public class Race {
-	
+
 	private static final Random myRand = new Random();
 	private final Track track;
 	private List<Participant> participants;
@@ -51,7 +56,7 @@ public class Race {
 		List<String> messages = new ArrayList<>();
 		if (time == 0) {
 			messages.addAll(setUpMessages());
-			System.out.println(messages);
+//			System.out.println(messages);
 		}
 		for (Participant participant : participants) {
 			// Evaluate constraints
@@ -129,7 +134,7 @@ public class Race {
 				participant.addConstraint("Acceleration", new AccelerationConstraint(Participant.DEFAULT_ACCELERATION, TrackSpeed.SLOW.getMultiplier() * participant.getVelocity()));
 			}
 		}
-		
+
 		if (participantDistance < 0) {
 			participant.addConstraint("track", new TrackSectionConstraint(TrackSpeed.SLOW));
 		}
@@ -182,7 +187,7 @@ public class Race {
 		List<String> messages = new ArrayList<>();
 		for (Participant p : participantsNotFinished) {
 			if (p.getLapNum() == numLaps) {
-				int crossTime = (int)time;
+				int crossTime = time;
 				messages.add(
 						format("$C:%d:%s:%d:%b", crossTime, p.getRacerId(), p.getLapNum(), p.getLapNum() == numLaps));
 				participantstoRemove.add(p);

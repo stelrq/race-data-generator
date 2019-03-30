@@ -1,27 +1,55 @@
 package view.util;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
+/**
+ * A ChangeListener for Integers that only consumes integers if they are less
+ * than a given max.
+ *
+ * @author Peter Bae, Michael Osborne
+ */
 public class IntMaxListener implements ChangeListener<String> {
 
-	private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d*");
+    /**
+     * The regular expression to use for validation.
+     */
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d*");
 
-	private Consumer<Integer> consumer;
-	private int myMax;
+    /**
+     * The consumer that consumes valid Integer values.
+     */
+    private Consumer<Integer> myConsumer;
 
-	public IntMaxListener(Consumer<Integer> consumer, int max) {
-		this.consumer = consumer;
-		myMax = max;
-	}
+    /**
+     * The max value.
+     */
+    private int myMax;
 
-	@Override
-	public void changed(ObservableValue<? extends String> c, String o, String n) {
-		if (n.length() > 0 && INTEGER_PATTERN.matcher(n).matches() && Integer.parseInt(n) <= myMax && Integer.parseInt(n) >= 1) {
-			consumer.accept(Integer.parseInt(n));
-		}
-	}
+    /**
+     * Constructs a new {@link IntMaxListener}.
+     *
+     * @param theConsumer The consumer to consume valid integer values.
+     * @param theMax      The max integer value that can be accepted.
+     */
+    public IntMaxListener(final Consumer<Integer> theConsumer,
+            final int theMax) {
+        myConsumer = theConsumer;
+        myMax = theMax;
+    }
+
+    /**
+     * Checks to see if the new value is valid, and consumes it if it is.
+     */
+    @Override
+    public void changed(final ObservableValue<? extends String> c,
+            final String o, final String n) {
+        if (n.length() > 0 && INTEGER_PATTERN.matcher(n).matches()
+                && Integer.parseInt(n) <= myMax && Integer.parseInt(n) >= 1) {
+            myConsumer.accept(Integer.parseInt(n));
+        }
+    }
 }
