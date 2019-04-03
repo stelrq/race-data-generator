@@ -13,6 +13,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import model.ParticipantSpeed;
 
+/**
+ * This class is a GridPane that displays a single participant's information.
+ *
+ * @author Michael Osborne
+ */
 public class ParticipantDisplay extends GridPane {
 
     private static final Random myRandom = new Random();
@@ -21,13 +26,14 @@ public class ParticipantDisplay extends GridPane {
 
     private static final List<Integer> USED_IDS = new ArrayList<>();
 
-    /** The lower bound for random Participant IDs (inclusive) */
+    /** The lower bound for random Participant IDs (inclusive). */
     private static final int DEFAULT_ID_LOWER = 1;
 
-    /** The upper bound for random Participant IDs (inclusive) */
+    /** The upper bound for random Participant IDs (inclusive). */
     private static final int DEFAULT_ID_UPPER = 99;
 
-    private static final String[] DEFAULT_NAMES = { "Rebecka", "Lexie",
+    /** The default names to choose from when generating racers. */
+    private static final String[] DEFAULT_NAMES = {"Rebecka", "Lexie",
             "Betsey", "Elane", "Miss", "Daniele", "Angele", "Aja", "Floretta",
             "Patrice", "Jamison", "Myles", "Sally", "Viola", "Delicia", "Dwain",
             "Alfredia", "Mina", "Charlena", "Catheryn", "Bud", "Suellen",
@@ -41,10 +47,14 @@ public class ParticipantDisplay extends GridPane {
     private TextField myNameTextField;
     private ComboBox<ParticipantSpeed> mySpeedComboBox;
 
-    // TODO implement checks to make sure there aren't duplicates in default
-    // names and id's (check somewhere else to see if the user entered duplicate names
-    // or ID's)
+    /**
+     * Constructs a new ParticipantDisplay.
+     */
     public ParticipantDisplay() {
+        // TODO implement checks to make sure there aren't duplicates in default
+        // names and id's (check somewhere else to see if the user entered
+        // duplicate names or ID's)
+
         // Generate new unique name and ID
         String name = DEFAULT_NAMES[myRandom.nextInt(DEFAULT_NAMES.length)];
         int id = myRandom.nextInt(DEFAULT_ID_UPPER - 1) + DEFAULT_ID_LOWER;
@@ -84,19 +94,37 @@ public class ParticipantDisplay extends GridPane {
         add(mySpeedComboBox, 4, 0);
     }
 
+    /**
+     * Clears the name and ID lists.
+     */
     public static void clearNamesAndIDS() {
         USED_NAMES.clear();
         USED_IDS.clear();
     }
 
+    /**
+     * Returns the participants name.
+     *
+     * @return The participants name.
+     */
     public String getName() {
         return myNameTextField.textProperty().get();
     }
 
+    /**
+     * Returns the participants ID.
+     *
+     * @return The participants ID.
+     */
     public int getID() {
         return Integer.parseInt(myRacerIDField.getText());
     }
 
+    /**
+     * Returns the ParticipantSpeed associated with the participant.
+     *
+     * @return The ParticipantSpeed associated with the participant.
+     */
     public ParticipantSpeed getSpeed() {
         return mySpeedComboBox.getSelectionModel().getSelectedItem();
     }

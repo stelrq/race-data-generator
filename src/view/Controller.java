@@ -44,85 +44,57 @@ import view.util.IntMaxListener;
 import view.util.ToolTips;
 
 /**
+ * This class is the main GUI for the race generator program.
  *
  * @author Myles Haynes
+ * @author Michael Osborne
+ * @author Peter Bae
  */
 public class Controller extends BorderPane {
-    private static final int DEFAULT_LAP_TIME = 60;
-    private static final int DEFAULT_RACERS = 10;
-    private static final int DEFAULT_NUM_LAPS = 1;
 
     private static Random rand = new Random();
 
+    // Components defined and built for us in the FXML.
+
     @FXML
     private TextField raceNameField;
-
     @FXML
     private Slider telemetryIntervalSlider;
-
-//	@FXML
-//	private Slider trackSpeedSlider;
-
     @FXML
     private Text fileDisplay;
-
     @FXML
     private Button outputFileButton;
-
     @FXML
     private TextField numLapsField;
-
     @FXML
     private Button submitRace;
-
     @FXML
     private BorderPane outerPane;
-
     @FXML
     private BorderPane innerPane;
-
-//	@FXML
-//	private TextField lapTimeField;
-
     @FXML
     private TextField numRacersField;
-
-    private TextField trackLengthField;
-
-    private TextField xRatioField;
-
-    private TextField yRatioField;
-
-    private FlowPane configPane;
-
-    private FlowPane generationControlPane;
-
-    private List<TextField> speedFields;
-
-    private List<TextField> rangeFields;
-
-    private List<ParticipantDisplay> participantDisplays;
-
-    private List<TextField> trackSpeedMultiplierFields;
-
-    private ScrollPane myParticipantScrollPane;
-
-    private GridPane myParticipantPane;
-
-    public ProgressBar progressBar;
-
-    private File outputFile;
-
-    private Track myTrack;
-
-    private List<ComboBox<TrackSpeed>> myTrackSectionComboBoxes;
-
-    private List<String> linesToWrite;
 
     private int numLaps;
     private int numRacers;
     private int lapTime;
     private int numSpeedBrackets;
+    private TextField trackLengthField;
+    private TextField xRatioField;
+    private TextField yRatioField;
+    private FlowPane configPane;
+    private FlowPane generationControlPane;
+    private List<TextField> speedFields;
+    private List<TextField> rangeFields;
+    private List<ParticipantDisplay> participantDisplays;
+    private List<TextField> trackSpeedMultiplierFields;
+    private List<ComboBox<TrackSpeed>> myTrackSectionComboBoxes;
+    private ScrollPane myParticipantScrollPane;
+    private GridPane myParticipantPane;
+    public ProgressBar progressBar;
+    private File outputFile;
+    private Track myTrack;
+    private List<String> linesToWrite;
     private List<ParticipantSpeed> speedBracketList;
     private Map<ParticipantSpeed, Text> estimateTimes;
 
@@ -132,22 +104,12 @@ public class Controller extends BorderPane {
      */
     public Controller() {
         super();
-        numLaps = DEFAULT_NUM_LAPS;
-        linesToWrite = new ArrayList<>();
-        participantDisplays = new ArrayList<>();
-        estimateTimes = new HashMap<>();
 
         instantiateComponents();
 
-//		setUpTrackView();
-
-//		setCenter(innerPane);
         setSpeedBracketList();
         setUpConfigPane();
         setUpGenerationControlPane();
-
-//		numSpeedBrackets = (int) trackSpeedSlider.getValue();
-        numRacers = Integer.parseInt(numRacersField.textProperty().getValue());
 
         setUpParticipantPane();
 
@@ -167,21 +129,13 @@ public class Controller extends BorderPane {
             updateParticipantPane();
         }, 30);
         numRacersField.textProperty().addListener(racerNumListener);
+
         // Force the new IntListener to update
         racerNumListener.changed(numRacersField.textProperty(), "",
                 Integer.toString(numRacers));
 
         numLapsField.textProperty()
                 .addListener(new IntListener((i) -> numLaps = i));
-        // lapTimeField.textProperty().addListener(new IntListener((i) ->
-        // lapTime = i));
-//		trackSpeedSlider.valueProperty().addListener((i, o, n) -> {
-//			numSpeedBrackets = i.getValue().intValue();
-//			resetSpeedBrackets();
-//			setSpeedBracketList();
-//			setupTrackSpeedView();
-//			updateSpeedBracketComboBox();
-//		});
 
         setToolTips();
         autosize();
@@ -211,11 +165,19 @@ public class Controller extends BorderPane {
 
     }
 
+    /**
+     * Instantiate all UI components.
+     */
     private void instantiateComponents() {
+        // This is bad, default values are hard coded, fix later.
+
         // Instantiation
+        numLaps = 1;
+        linesToWrite = new ArrayList<>();
+        participantDisplays = new ArrayList<>();
+        estimateTimes = new HashMap<>();
         configPane = new FlowPane(Orientation.VERTICAL);
         generationControlPane = new FlowPane(Orientation.VERTICAL);
-
         trackSpeedMultiplierFields = new ArrayList<TextField>();
         myTrackSectionComboBoxes = new ArrayList<>();
         xRatioField = new TextField("2");
@@ -225,16 +187,24 @@ public class Controller extends BorderPane {
         raceNameField = new TextField("My305Race");
         telemetryIntervalSlider = new Slider();
         numRacersField = new TextField("10");
+        numRacers = 10;
         fileDisplay = new Text();
         outputFileButton = new Button("Browse...");
         submitRace = new Button("Generate Race");
         numLapsField = new TextField("1");
-        setLeft(configPane);
         progressBar = new ProgressBar();
 
+        // all config stuff goes on left
+        setLeft(configPane);
     }
 
+    /**
+     * Set up all race config UI elements.
+     */
     private void setUpConfigPane() {
+        // This is monolithic and bad code, but in the prototyping stage this
+        // allows for easy config and adding/removing elements.
+
         // Instantiation
         GridPane raceConfigPane = new GridPane();
         GridPane trackSpeedConfigPane = new GridPane();
@@ -372,7 +342,8 @@ public class Controller extends BorderPane {
         // Add a message about the tooltips
         Text tooltipMessage = new Text(
                 "Hover over Text Fields/Sliders to see help and usage tips.\n"
-                        + "If you click submit and nothing happens, one of the fields must be invalid. Have fun!");
+                        + "If you click submit and nothing happens, one of the "
+                        + "fields must be invalid. Have fun!");
         tooltipMessage.setFont(new Font(15));
         tooltipMessage.setStyle("-fx-fill: red;");
         tooltipMessage.textAlignmentProperty().set(TextAlignment.CENTER);
@@ -384,8 +355,7 @@ public class Controller extends BorderPane {
         configPane.getChildren().addAll(raceConfigPane, trackSpeedConfigPane);
 
         // First instantiate all the values in estimateTimes and add them to
-        // their own
-        // pane
+        // their own pane
         for (int i = 0; i < ParticipantSpeed.values().length; i++) {
             Text estimate = new Text("Estimated time for a "
                     + ParticipantSpeed.values()[i]
@@ -404,6 +374,9 @@ public class Controller extends BorderPane {
         configPane.setPrefHeight(500);
     }
 
+    /**
+     * Sets up the pane that holds the generation controls.
+     */
     private void setUpGenerationControlPane() {
         // Formatting
         generationControlPane.setColumnHalignment(HPos.CENTER);
@@ -417,42 +390,32 @@ public class Controller extends BorderPane {
 
         generationControlPane.getChildren().addAll(fileDisplay,
                 outputFileButton, submitRace, progressBar);
+
+        // add to bottom
         setBottom(generationControlPane);
     }
 
-//	private void addTrackSpeedAndRange(ParticipantSpeed bracket) {
-//
-//		configPane.add(new Text(bracket + " Speed"), 0);
-//
-//		TextField speedField = new TextField(Double.toString(bracket.getVelocity()));
-//		speedField.setPrefWidth(50);
-//		speedField.textProperty().addListener(new DoubleListener((i) -> updateSpeedBracket(bracket, i)));
-//		speedFields.add(speedField);
-//		configPane.add(speedField, 1);
-//
-//		configPane.add(new Text(bracket + " Range (+/-)"), 2);
-//
-//		TextField rangeField = new TextField(Double.toString(bracket.getRange()));
-//		rangeField.setPrefWidth(50);
-//		rangeField.textProperty().addListener(new DoubleListener((i) -> updateRangeBracket(bracket, i)));
-//		rangeFields.add(rangeField);
-//		configPane.add(rangeField, 3, );
-//
-//		configPane.add(new Text(bracket + " Est. Finish"), 4);
-//
-//		Text estimate = new Text(String.format("%.2f", controller.getLength() / bracket.getVelocity() / 1000));
-//		estimateTimes.put(bracket, estimate);
-//		configPane.add(estimate, 5);
-//	}
-
-    private void updateSpeedBracket(ParticipantSpeed speedBracket,
-            double newSpeed, double newRange) {
+    /**
+     * Updates the speed brackets to have the new speed and new variability.
+     *
+     * @param speedBracket The speed bracket to change
+     * @param newSpeed The new speed
+     * @param newRange The old speed
+     */
+    private void updateSpeedBracket(final ParticipantSpeed speedBracket,
+            final double newSpeed, final double newRange) {
         speedBracket.setVelocity(newSpeed);
         speedBracket.setRange(newRange);
         updateEstimate(speedBracket);
     }
 
-    private void updateEstimate(ParticipantSpeed speedBracket) {
+    /**
+     * Updates the UI estimate for the racers with the given speed to complete a
+     * lap.
+     *
+     * @param speedBracket The ParticipantSpeed to update.
+     */
+    private void updateEstimate(final ParticipantSpeed speedBracket) {
         estimateTimes.get(speedBracket).setText("Estimated time for a "
                 + speedBracket + " racer to complete a lap: " + String
                         .format("%.2f",
@@ -461,6 +424,9 @@ public class Controller extends BorderPane {
                 + " seconds");
     }
 
+    /**
+     * Sets up the pane showing the participants.
+     */
     private void setUpParticipantPane() {
         // Instantiation
         myParticipantScrollPane = new ScrollPane();
@@ -474,55 +440,23 @@ public class Controller extends BorderPane {
         setRight(myParticipantScrollPane);
     }
 
-//	private void updateSpeedBracketComboBox() {
-//		int num = 0;
-//		List<Node> boxes = new ArrayList<>();
-//		for (Node n : myParticipantPane.getChildren()) {
-//			if (n instanceof ComboBox) {
-//				boxes.add(n);
-//				num++;
-//			}
-//		}
-//
-//		myParticipantPane.getChildren().removeAll(boxes);
-//
-//		for (int i = 0; i < num; i++) {
-//			ComboBox<String> cb = new ComboBox<>(getOptions());
-//			cb.getSelectionModel().select(cb.getItems().size() / 2);
-//			myParticipantPane.add(cb, 4, i);
-//		}
-//	}
-
+    /**
+     * Set up the speed bracket list for participants.
+     */
     private void setSpeedBracketList() {
+        // We settled on three speeds, thinking that more granularity in speed
+        // would not provide for a much better race. We could be wrong.
+
         speedBracketList = new ArrayList<>();
-        // Eventually add this functionality back in, for now just 3 speeds.
-//		switch (numSpeedBrackets) {
-//		case 3:
-//			speedBracketList.add(ParticipantSpeed.FAST);
-//			speedBracketList.add(ParticipantSpeed.MEDIUM);
-//			speedBracketList.add(ParticipantSpeed.SLOW);
-//			break;
-//		case 5:
-//			speedBracketList.add(ParticipantSpeed.FASTER);
-//			speedBracketList.add(ParticipantSpeed.FAST);
-//			speedBracketList.add(ParticipantSpeed.MEDIUM);
-//			speedBracketList.add(ParticipantSpeed.SLOW);
-//			speedBracketList.add(ParticipantSpeed.SLOWER);
-//			break;
-//		case 7:
-//			speedBracketList.add(ParticipantSpeed.FASTEST);
-//			speedBracketList.add(ParticipantSpeed.FASTER);
-//			speedBracketList.add(ParticipantSpeed.FAST);
-//			speedBracketList.add(ParticipantSpeed.MEDIUM);
-//			speedBracketList.add(ParticipantSpeed.SLOW);
-//			speedBracketList.add(ParticipantSpeed.SLOWER);
-//			speedBracketList.add(ParticipantSpeed.SLOWEST);
-//		}
         speedBracketList.add(ParticipantSpeed.FAST);
         speedBracketList.add(ParticipantSpeed.MEDIUM);
         speedBracketList.add(ParticipantSpeed.SLOW);
     }
 
+    /**
+     * Re-populates the participant pane, filling it with numRacers
+     * ParticipantDisplays.
+     */
     private void updateParticipantPane() {
         participantDisplays.clear();
         myParticipantPane.getChildren().clear();
@@ -535,6 +469,9 @@ public class Controller extends BorderPane {
         myParticipantPane.setPrefWidth(new ParticipantDisplay().getPrefWidth());
     }
 
+    /**
+     * Shows a FileChooser for the user to select a place to save the race file.
+     */
     private void chooseFile() {
         FileChooser chooser = new FileChooser();
         chooser.setInitialFileName(outputFile.getName());
@@ -549,6 +486,9 @@ public class Controller extends BorderPane {
         }
     }
 
+    /**
+     * Listener method for when the user clicks generate.
+     */
     private void onSubmit() {
         progressBar.setVisible(true);
         SimTask task = new SimTask();
@@ -557,9 +497,13 @@ public class Controller extends BorderPane {
         new Thread(task).start();
     }
 
-    // This is a fix for the randomness causing the last racer to
-    // actually finish after the specified time, this method is a
-    // hack to change the time to the last racer
+
+    /**
+     * This is a fix for the randomness (variability) causing the last racer
+     * to actually finish after the specified time, this method is a hack to
+     * change the entire race time to the time that the last racer passes the
+     * finish line.
+     */
     private void adjustForLastRacer() {
 
         // Start at the end of the array and look back until we find when
@@ -579,15 +523,23 @@ public class Controller extends BorderPane {
         // Modify the time to be this new value
         linesToWrite.set(5, "#TIME:" + raceActuallyOver);
 
-//		System.out.println(raceActuallyOver);
     }
 
+    /**
+     * This class is a ChangeListener that updates time estimates for racers
+     * based on changes in fields so users can get an semi-intuitive idea of
+     * how track config changes will change the race.
+     */
     private class TrackChangeListener implements ChangeListener<String> {
 
         @Override
-        public void changed(ObservableValue<? extends String> observable,
-                String oldValue, String newValue) {
-            // We know something updated, so just create a new track
+        public void changed(final ObservableValue<? extends String> observable,
+                final String oldValue, final String newValue) {
+            // TODO Right now the estimates only update on changing participant
+            // speeds, make it so the estimates update based on the track speeds
+            // and other factors as well.
+
+            // We know something updated, so just create a whole new track
             if (validInteger(trackLengthField.textProperty().get())
                     && validInteger(xRatioField.textProperty().get())
                     && validInteger(yRatioField.textProperty().get())) {
@@ -597,15 +549,20 @@ public class Controller extends BorderPane {
                         Integer.parseInt(yRatioField.textProperty().get()));
 
                 // Update estimates for all speed brackets (only matters if
-                // track length
-                // changed)
+                // track length changed)
                 for (ParticipantSpeed ps : speedBracketList) {
                     updateEstimate(ps);
                 }
             }
         }
 
-        private boolean validInteger(String string) {
+        /**
+         * Validates that the given String is an integer, and returns that
+         * Integer.
+         * @param string The string to be validated
+         * @return The parsed integer, if possible.
+         */
+        private boolean validInteger(final String string) {
             try {
                 Integer.parseInt(string);
                 return true;
@@ -616,21 +573,20 @@ public class Controller extends BorderPane {
 
     }
 
+    /**
+     * This is the thread that actually builds the race, this is where the
+     * rubber meets the road and the file is generated.
+     */
     private class SimTask extends Task<Void> {
+
         @Override
         protected Void call() throws Exception {
             try {
                 int telemetryInterval = (int) telemetryIntervalSlider
                         .getValue();
                 List<Participant> participants = new ArrayList<>();
-//				List<Integer> ids = participantIdFields.stream()
-//						.map((id) -> Integer.parseInt(id.textProperty().getValue())).collect(Collectors.toList());
-//				List<String> names = participantNameFields.stream().map((name) -> name.textProperty().getValue())
-//						.collect(Collectors.toList());
 
                 double start = 0;
-                // System.out.println(speedBracket);
-                // System.out.println(rangeBracket);
                 for (ParticipantDisplay pd : participantDisplays) {
                     Participant p = new Participant(pd.getID(), pd.getName(),
                             start, myTrack.getTrackLength(), pd.getSpeed());

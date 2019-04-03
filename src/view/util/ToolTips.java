@@ -1,3 +1,9 @@
+/**
+* The classes in this package contain utilities to help with various tasks in
+* the view.
+*
+* @author Myles Haynes, Peter Bae, Michael Osborne
+*/
 package view.util;
 
 import javafx.scene.control.Tooltip;
@@ -5,7 +11,7 @@ import javafx.util.Duration;
 
 /**
  * This class holds the text for the apps informational tooltips as well as
- * methods to aid with tooltip actions.
+ * methods to aid with tooltip creation.
  *
  * @author Michael Osborne
  */

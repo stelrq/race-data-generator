@@ -1,13 +1,9 @@
 package model.track;
 
 public enum TrackSpeed {
-//	FASTEST,
-//	FASTER,
 	FAST(1.5, "Fast"),
 	MEDIUM(1.0, "Medium"),
 	SLOW(0.5, "Slow");
-//	SLOWER,
-//	SLOWEST;
 
 	private double multiplier;
 	private String myName;

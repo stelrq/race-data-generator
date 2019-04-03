@@ -6,7 +6,10 @@ import java.util.List;
 
 /**
  *
+ *
  * @author Myles Haynes
+ * @author Michael Osborne
+ * @author Peter Bae
  */
 public class OvalTrack extends Track {
 
