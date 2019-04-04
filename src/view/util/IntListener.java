@@ -9,7 +9,9 @@ import javafx.beans.value.ObservableValue;
 /**
  * A ChangeListener for Integers.
  *
- * @author Myles Haynes, Peter Bae, Michael Osborne
+ * @author Myles Haynes
+ * @author Peter Bae
+ * @author Michael Osborne
  */
 public class IntListener implements ChangeListener<String> {
 

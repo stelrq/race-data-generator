@@ -2,7 +2,9 @@
 * The classes in this package contain utilities to help with various tasks in
 * the view.
 *
-* @author Myles Haynes, Peter Bae, Michael Osborne
+* @author Myles Haynes
+* @author Peter Bae
+* @author Michael Osborne
 */
 package view.util;
 

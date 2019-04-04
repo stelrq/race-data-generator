@@ -33,7 +33,7 @@ public class ParticipantDisplay extends GridPane {
     private static final int DEFAULT_ID_UPPER = 99;
 
     /** The default names to choose from when generating racers. */
-    private static final String[] DEFAULT_NAMES = {"Rebecka", "Lexie",
+    private static final String[] DEFAULT_NAMES = { "Rebecka", "Lexie",
             "Betsey", "Elane", "Miss", "Daniele", "Angele", "Aja", "Floretta",
             "Patrice", "Jamison", "Myles", "Sally", "Viola", "Delicia", "Dwain",
             "Alfredia", "Mina", "Charlena", "Catheryn", "Bud", "Suellen",

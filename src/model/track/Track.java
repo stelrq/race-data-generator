@@ -2,40 +2,103 @@ package model.track;
 
 import java.util.List;
 
-import model.SpeedClass;
-
 /**
- * 
+ * Defines the functionality of a Track to be used in a Race Generation program.
+ *
  * @author Myles Haynes
+ * @author Michael Osborne
  */
 public abstract class Track {
 
-	protected int trackLength;
+    protected int trackLength;
 
-	public Track(int trackLength) {
-		this.trackLength = trackLength;
-	}
+    /**
+     * Constructs a new track with the given length.
+     *
+     * @param theTrackLength The length of the track
+     */
+    public Track(final int theTrackLength) {
+        trackLength = theTrackLength;
+    }
 
-	public int getTrackLength() {
-		return trackLength;
-	}
-	
-	public abstract void setSections(List<TrackSpeed> theSpeeds);
-	
-	public abstract double getWidth();
-	
-	public abstract double getHeight();
-	
-	public abstract int getHeightRatio();
-	
-	public abstract int getWidthRatio();
+    /**
+     * Gets the track length.
+     *
+     * @return This track's length
+     */
+    public int getTrackLength() {
+        return trackLength;
+    }
 
-	public abstract TrackSpeed getTrackSpeed(double distance);
-	
-	public abstract TrackSpeed getNextTrackSpeed(double distance);
-	
-	public abstract double getDistanceUntilNextTrackPiece(double distance);
+    /**
+     * Sets the sections of the track to the given TrackSpeeds.
+     *
+     * @param theSpeeds The TrackSpeeds to set the track to.
+     */
+    public abstract void setSections(List<TrackSpeed> theSpeeds);
 
-	public abstract String getTrackName();
+    /**
+     * Gets the width.
+     *
+     * @return This track's width
+     */
+    public abstract double getWidth();
+
+    /**
+     * Gets the height.
+     *
+     * @return This track's height
+     */
+    public abstract double getHeight();
+
+    /**
+     * Gets the yRatio of the track.
+     *
+     * @return This track's yRatio (height ratio)
+     */
+    public abstract int getHeightRatio();
+
+    /**
+     * Gets the xRatio of the track.
+     *
+     * @return This track's xRatio (width ratio)
+     */
+    public abstract int getWidthRatio();
+
+    /**
+     * Gets the track speed of the section of track at the given distance.
+     *
+     * @param distance The distance around the track to find the track speed at
+     * @return The TrackSpeed of the track section at the given distance around
+     *         the race track
+     */
+    public abstract TrackSpeed getTrackSpeed(double distance);
+
+    /**
+     * Gets the track speed of the section of track AFTER the section of track
+     * at the given distance.
+     *
+     * @param distance The distance around the track to find the next track
+     *                 speed at
+     * @return The TrackSpeed of the track section AFTER the track section at
+     *         the given distance around the race track
+     */
+    public abstract TrackSpeed getNextTrackSpeed(double distance);
+
+    /**
+     * Gets the distance until the next track section from the section
+     * associated with the given distance.
+     *
+     * @param distance The distance to determine the current track section
+     * @return The distance until the next track section
+     */
+    public abstract double getDistanceUntilNextTrackSection(double distance);
+
+    /**
+     * Gets the name of the track.
+     *
+     * @return This track's name
+     */
+    public abstract String getTrackName();
 
 }

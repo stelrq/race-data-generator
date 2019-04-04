@@ -5,7 +5,7 @@ import static java.lang.Math.PI;
 import java.util.List;
 
 /**
- *
+ * OvalTrack is a track that supports shaping into an oval.
  *
  * @author Myles Haynes
  * @author Michael Osborne
@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class OvalTrack extends Track {
 
-//	private List<TrackSectionConstraint> sections;
     private int xRatio;
     private int yRatio;
     private double width;
@@ -21,8 +20,7 @@ public class OvalTrack extends Track {
 
     // Hard coded speeds for the sections of the track traversing the track
     // counterclockwise starting with first turn, second turn, back straight
-    // away,
-    // etc...
+    // away, etc...
     private TrackSpeed[] trackSpeeds = new TrackSpeed[6];
 
     private double frontStraightAway;
@@ -32,25 +30,32 @@ public class OvalTrack extends Track {
     private double thirdTurn;
     private double fourthTurn;
 
-    public OvalTrack(int distance, int xRatio, int yRatio) {
+    /**
+     * Constructs a new OvalTrack.
+     *
+     * @param distance  The distance of the OvalTrack
+     * @param theXRatio The xRatio of the shape of the OvalTrack
+     * @param theYRatio The yRation of the shape of the OvalTrack
+     */
+    public OvalTrack(final int distance, final int theXRatio,
+            final int theYRatio) {
         super(distance);
-        if (yRatio > xRatio) {
+        if (theYRatio > theXRatio) {
             throw new IllegalArgumentException(
                     "width must be greater than height");
         }
-//		sections = new ArrayList<>();
-        this.xRatio = xRatio;
-        this.yRatio = yRatio;
+        xRatio = theXRatio;
+        yRatio = theYRatio;
         buildTrackModel();
     }
 
     @Override
-    public TrackSpeed getTrackSpeed(double d) {
+    public TrackSpeed getTrackSpeed(final double d) {
         return trackSpeeds[(int) getSpeedIndexAndNextGate(d)[0]];
     }
 
     @Override
-    public TrackSpeed getNextTrackSpeed(double distance) {
+    public TrackSpeed getNextTrackSpeed(final double distance) {
         // Get the speed then add 1 to it to get the next track speed in the
         // array.
         int desiredIndex = (int) getSpeedIndexAndNextGate(distance)[0] + 1;
@@ -61,10 +66,14 @@ public class OvalTrack extends Track {
         return trackSpeeds[desiredIndex];
     }
 
-    // Returns a double array with values: { speedIndex, nextGate }
-    // corresponding to
-    // the given distance around the track.
-    private double[] getSpeedIndexAndNextGate(double distance) {
+    /**
+     * Returns a double array with values: { speedIndex, nextGate }
+     * corresponding to the given distance around the track.
+     *
+     * @param distance The distance around the track
+     * @return A double array with values { speedIndex, nextGate }
+     */
+    private double[] getSpeedIndexAndNextGate(final double distance) {
         final double[] returnVals = new double[2];
         if (distance >= 0 && distance < firstTurn) {
             returnVals[0] = 0;
@@ -94,10 +103,14 @@ public class OvalTrack extends Track {
     }
 
     @Override
-    public double getDistanceUntilNextTrackPiece(double distance) {
+    public double getDistanceUntilNextTrackSection(final double distance) {
         return getSpeedIndexAndNextGate(distance)[1] - distance;
     }
 
+    /**
+     * Determines the distance on each section of the track based on the total
+     * track length.
+     */
     private void buildTrackModel() {
         width = (xRatio * trackLength)
                 / ((yRatio * Math.PI) + (2 * xRatio) - (2 * yRatio));
@@ -140,7 +153,7 @@ public class OvalTrack extends Track {
     }
 
     @Override
-    public void setSections(List<TrackSpeed> theSpeeds) {
+    public void setSections(final List<TrackSpeed> theSpeeds) {
         Object[] tempArr = theSpeeds.toArray();
         for (int i = 0; i < tempArr.length; i++) {
             trackSpeeds[i] = (TrackSpeed) tempArr[i];

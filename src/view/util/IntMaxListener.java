@@ -10,7 +10,8 @@ import javafx.beans.value.ObservableValue;
  * A ChangeListener for Integers that only consumes integers if they are less
  * than a given max.
  *
- * @author Peter Bae, Michael Osborne
+ * @author Peter Bae
+ * @author Michael Osborne
  */
 public class IntMaxListener implements ChangeListener<String> {
 

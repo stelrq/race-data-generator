@@ -399,8 +399,8 @@ public class Controller extends BorderPane {
      * Updates the speed brackets to have the new speed and new variability.
      *
      * @param speedBracket The speed bracket to change
-     * @param newSpeed The new speed
-     * @param newRange The old speed
+     * @param newSpeed     The new speed
+     * @param newRange     The old speed
      */
     private void updateSpeedBracket(final ParticipantSpeed speedBracket,
             final double newSpeed, final double newRange) {
@@ -497,12 +497,11 @@ public class Controller extends BorderPane {
         new Thread(task).start();
     }
 
-
     /**
-     * This is a fix for the randomness (variability) causing the last racer
-     * to actually finish after the specified time, this method is a hack to
-     * change the entire race time to the time that the last racer passes the
-     * finish line.
+     * This is a fix for the randomness (variability) causing the last racer to
+     * actually finish after the specified time, this method is a hack to change
+     * the entire race time to the time that the last racer passes the finish
+     * line.
      */
     private void adjustForLastRacer() {
 
@@ -527,8 +526,8 @@ public class Controller extends BorderPane {
 
     /**
      * This class is a ChangeListener that updates time estimates for racers
-     * based on changes in fields so users can get an semi-intuitive idea of
-     * how track config changes will change the race.
+     * based on changes in fields so users can get an semi-intuitive idea of how
+     * track config changes will change the race.
      */
     private class TrackChangeListener implements ChangeListener<String> {
 
@@ -559,6 +558,7 @@ public class Controller extends BorderPane {
         /**
          * Validates that the given String is an integer, and returns that
          * Integer.
+         *
          * @param string The string to be validated
          * @return The parsed integer, if possible.
          */
@@ -638,7 +638,6 @@ public class Controller extends BorderPane {
                 Race race = new Race(myTrack, numLaps, telemetryInterval,
                         participants);
                 while (race.stillGoing()) {
-//					System.out.println("going");
                     race.stepRace().forEach(linesToWrite::add);
                     currentTime++;
                     updateProgress(currentTime, expectedTime);

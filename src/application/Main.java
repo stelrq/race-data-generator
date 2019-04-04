@@ -8,7 +8,8 @@ import view.Controller;
 /**
  * This class launches the JavaFX application.
  *
- * @author Myles Haynes, Michael Osborne
+ * @author Myles Haynes
+ * @author Michael Osborne
  */
 public class Main extends Application {
 
