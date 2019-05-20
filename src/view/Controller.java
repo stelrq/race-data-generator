@@ -15,10 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressBar;
@@ -53,7 +51,6 @@ import view.util.ToolTips;
 public class Controller extends BorderPane {
 
     private static Random rand = new Random();
-
     // Components defined and built for us in the FXML.
 
     @FXML
@@ -63,11 +60,17 @@ public class Controller extends BorderPane {
     @FXML
     private Text fileDisplay;
     @FXML
-    private Button outputFileButton;
+    private Text settingsNameField;
+    @FXML
+    private Button outputRaceFileButton;
+    @FXML
+    private Button outputSettingsFileButton;
     @FXML
     private TextField numLapsField;
     @FXML
     private Button submitRace;
+    @FXML
+    public Button submitSettings;
     @FXML
     private BorderPane outerPane;
     @FXML
@@ -83,7 +86,7 @@ public class Controller extends BorderPane {
     private TextField xRatioField;
     private TextField yRatioField;
     private FlowPane configPane;
-    private FlowPane generationControlPane;
+    private GridPane generationControlPane;
     private List<TextField> speedFields;
     private List<TextField> rangeFields;
     private List<ParticipantDisplay> participantDisplays;
@@ -93,6 +96,7 @@ public class Controller extends BorderPane {
     private GridPane myParticipantPane;
     public ProgressBar progressBar;
     private File outputFile;
+    private File mySettingsFile; //field to store settings if the user wants.
     private Track myTrack;
     private List<String> linesToWrite;
     private List<ParticipantSpeed> speedBracketList;
@@ -114,15 +118,22 @@ public class Controller extends BorderPane {
         setUpParticipantPane();
 
         outputFile = new File("myRace.rce");
+        mySettingsFile = new File("mySettings.csv");
         try {
             fileDisplay.setText(outputFile.getCanonicalPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            settingsNameField.setText(mySettingsFile.getCanonicalPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        outputFileButton.setOnAction(event -> chooseFile());
+        outputRaceFileButton.setOnAction(event -> chooseFile("*.rce", outputFile));
         submitRace.setOnAction(event -> onSubmit());
-
+        outputSettingsFileButton.setOnAction(event -> chooseFile("*.csv", mySettingsFile));
+        submitSettings.setOnAction(event -> saveSettings());
         final IntMaxListener racerNumListener = new IntMaxListener((i) -> {
             numRacers = i;
             ParticipantDisplay.clearNamesAndIDS();
@@ -177,7 +188,7 @@ public class Controller extends BorderPane {
         participantDisplays = new ArrayList<>();
         estimateTimes = new HashMap<>();
         configPane = new FlowPane(Orientation.VERTICAL);
-        generationControlPane = new FlowPane(Orientation.VERTICAL);
+        generationControlPane = new GridPane();
         trackSpeedMultiplierFields = new ArrayList<TextField>();
         myTrackSectionComboBoxes = new ArrayList<>();
         xRatioField = new TextField("2");
@@ -189,8 +200,11 @@ public class Controller extends BorderPane {
         numRacersField = new TextField("10");
         numRacers = 10;
         fileDisplay = new Text();
-        outputFileButton = new Button("Browse...");
+        settingsNameField = new Text();
+        outputRaceFileButton = new Button("Browse...");
+        outputSettingsFileButton = new Button("Browse...");
         submitRace = new Button("Generate Race");
+        submitSettings = new Button("Save Settings");
         numLapsField = new TextField("1");
         progressBar = new ProgressBar();
 
@@ -379,7 +393,7 @@ public class Controller extends BorderPane {
      */
     private void setUpGenerationControlPane() {
         // Formatting
-        generationControlPane.setColumnHalignment(HPos.CENTER);
+//        generationControlPane.setColumnHalignment(HPos.CENTER);
         generationControlPane.setAlignment(Pos.CENTER);
         generationControlPane.setHgap(10);
         generationControlPane.setVgap(10);
@@ -389,8 +403,21 @@ public class Controller extends BorderPane {
         progressBar.setVisible(false);
 
         generationControlPane.getChildren().addAll(fileDisplay,
-                outputFileButton, submitRace, progressBar);
-
+                outputRaceFileButton, submitRace);
+        int column = 0;
+        int row = 0;
+        boolean nextColumn = false;
+        for (int i = 0; i < generationControlPane.getChildren().size(); i++) {
+            Node toPosition = generationControlPane.getChildren().get(i);
+            generationControlPane.setConstraints(toPosition, 0, i, 1, 1, HPos.CENTER, VPos.CENTER);
+        }
+        generationControlPane.getChildren().addAll(settingsNameField, outputSettingsFileButton, submitSettings);
+        for (int i = 3; i < generationControlPane.getChildren().size(); i++) {
+            Node toPosition = generationControlPane.getChildren().get(i);
+            generationControlPane.setConstraints(toPosition, 1, i - 3, 1, 1, HPos.CENTER, VPos.CENTER);
+        }
+        generationControlPane.getChildren().add(progressBar);
+        generationControlPane.setConstraints(progressBar, 0, 4, 1, 1, HPos.CENTER, VPos.CENTER);
         // add to bottom
         setBottom(generationControlPane);
     }
@@ -471,21 +498,59 @@ public class Controller extends BorderPane {
 
     /**
      * Shows a FileChooser for the user to select a place to save the race file.
+     * Pass in the file extension
+     * @param The extension of the file to be saved in the \*.extension format
      */
-    private void chooseFile() {
+    private void chooseFile(String theExtension, File toWrite) {
         FileChooser chooser = new FileChooser();
-        chooser.setInitialFileName(outputFile.getName());
+        chooser.setInitialFileName(toWrite.getName());
         chooser.getExtensionFilters()
-                .add(new ExtensionFilter("Race File", "*.rce"));
-        File previousOutputFile = outputFile;
-        outputFile = chooser.showSaveDialog(getScene().getWindow());
+                .add(new ExtensionFilter("Race File", theExtension));
+        File previousFile = toWrite;
+        toWrite = chooser.showSaveDialog(getScene().getWindow());
         try {
-            fileDisplay.setText(outputFile.getCanonicalPath());
+            fileDisplay.setText(toWrite.getCanonicalPath());
         } catch (Exception e) {
-            outputFile = previousOutputFile;
+            toWrite = previousFile;
         }
     }
+    /**
+     * Allows user to save settings in settings csv file.
+     */
+    public void saveSettings() {
 
+
+    }
+    public static void writeDataLineByLine(String filePath)
+    {
+        // first create file object for file placed at location
+        // specified by filepath
+        File file = new File(filePath);
+        try {
+            // create FileWriter object with file as parameter
+            FileWriter fw = new FileWriter(mySettingsFile);
+
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(fw);
+
+            // adding header to csv
+            String[] header = { "Name", "Class", "Marks" };
+            writer.writeNext(header);
+
+            // add data to csv
+            String[] data1 = { "Aman", "10", "620" };
+            writer.writeNext(data1);
+            String[] data2 = { "Suraj", "10", "630" };
+            writer.writeNext(data2);
+
+            // closing writer connection
+            writer.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     /**
      * Listener method for when the user clicks generate.
      */

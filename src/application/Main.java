@@ -25,6 +25,9 @@ public class Main extends Application {
         Scene scene = new Scene(c);
         stage.setScene(scene);
         stage.centerOnScreen();
+        stage.setOnCloseRequest(event -> {
+            System.out.println("Application closing.");
+        } );
         stage.show();
     }
 
